@@ -301,4 +301,6 @@ class TradingView:
             print('Got Error while opening chart')
 
     def close(self):
-        self.driver.quit()
+        if self.driver:
+            self.driver.quit()
+            self.driver = None
