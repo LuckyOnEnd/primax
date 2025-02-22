@@ -157,8 +157,9 @@ class TradingView:
                     error_text = WebDriverWait(self.driver, 10).until(
                         EC.visibility_of_element_located(
                             (By.XPATH,
-                             "//span[text()='Invalid password. If you've forgot your password, try using the Log in with Google button.']")
-                            )
+                             '//span[contains(text(), "Invalid password.")]'
+                             )
+                        )
                     )
                     raise CredentialException('Authorize was not success')
                 except TimeoutException:
