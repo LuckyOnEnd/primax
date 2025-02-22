@@ -140,7 +140,7 @@ class TradingView:
                 sleep(1)
                 self.call_enter_credentials()
                 if ('https://www.tradingview.com/pricing/?source=header_go_pro_button&feature'
-                    '=start_free_trial')== self.driver.current_url:
+                    '=start_free_trial')== self.driver.current_url or 'sign' in self.driver.current_url:
                     raise Exception('Authorize was not successful')
              except TimeoutException as e:
                 print('we unable to look signin link')   
