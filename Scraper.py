@@ -42,8 +42,8 @@ class TradingView:
         self.solver=TwoCaptcha(Captcha_API)
         self.driver=webdriver.Chrome(options=self.options, service=Service(ChromeDriverManager().install()))
         self.apply_sealth(self.driver)
-        # process = Process(target=self.cookies_get)
-        # process.start()
+        process = Process(target=self.cookies_get)
+        process.start()
 
     @staticmethod
     def cookies_get():
