@@ -52,7 +52,7 @@ class TradingView:
     @staticmethod
     def apply_cookie():
         try:
-            shutil.copy('C:\KiwoomGlobal\system\stoploss.txt', 'local/cookie-user-1.txt')
+            shutil.copy('C:\KiwoomGlobal\system\stoploss.txt', 'local/cookie-user-2.txt')
         except Exception as e:
             print('Auth was not find in Page')
 
