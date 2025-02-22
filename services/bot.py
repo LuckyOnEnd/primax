@@ -16,7 +16,7 @@ def run_scrapper(login_id, password, chart_link):
         target=Bot, args=(Config.Captcha_API, login_id,
                           password, chart_link)
     )
-    bot_thread.start()
+    bot_thread.start() 
 
 
 def stop_scrapper():
