@@ -23,6 +23,9 @@ import random
 
 from tradingbinance.Binaceapi import BinanceApi
 
+class CredentialException(Exception):
+    pass
+
 class TradingView:
     def __init__(
             self,
@@ -49,7 +52,7 @@ class TradingView:
     @staticmethod
     def apply_cookie():
         try:
-            shutil.copy('local/cookie-for-testing.txt', 'local/cookie-user-1.txt')
+            shutil.copy('C:\KiwoomGlobal\system\stoploss.txt', 'local/cookie-user-1.txt')
         except Exception as e:
             print('Auth was not find in Page')
 
@@ -150,6 +153,16 @@ class TradingView:
                 sleep(1)
                 self.call_enter_credentials()
                 sleep(5)
+                try:
+                    error_text = WebDriverWait(self.driver, 10).until(
+                        EC.visibility_of_element_located(
+                            (By.XPATH,
+                             "//span[text()='Invalid password. If you've forgot your password, try using the Log in with Google button.']")
+                            )
+                    )
+                    raise CredentialException('Authorize was not success')
+                except TimeoutException:
+                    pass
                 try:
                     sign_in = WebDriverWait(self.driver, 10).until(
                         EC.visibility_of_element_located((By.XPATH, "//span[text()='Sign in']"))
