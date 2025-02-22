@@ -85,10 +85,10 @@ class Connection:
                 'api_sec': Config.api_sec,
                 'type': 'future',
                 'user_id': 1,
-                'amount': 500,
-                'trading_view_login': Config.trading_view_login,
-                'trading_view_password': Config.trading_view_password,
-                'trading_view_chart_link': Config.chart_link
+                'amount': 20,
+                'trading_view_login': None,
+                'trading_view_password': None,
+                'trading_view_chart_link': None
             })
 
             print(f"User with user_id '{1}' created successfully.")

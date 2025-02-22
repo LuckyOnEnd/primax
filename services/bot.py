@@ -8,6 +8,7 @@ bot: TradingView | None = None
 
 def run_scrapper(login_id, password, chart_link):
     global bot_thread, bot
+    stop_event.clear()
     bot_thread = threading.Thread(
         target=Bot, args=(Config.Captcha_API, login_id,
                           password, chart_link)
@@ -31,5 +32,12 @@ def stop_scrapper():
 def Bot(Captcha_API, Username, password, chart_link):
     global bot
     bot = TradingView(Captcha_API, Username, password, stop_event, chart_link)
-    bot.Login()
+    count = 0
+    for x in range(0, 10):
+        try:
+            bot.Login()
+            break
+        except Exception as e:
+            count += 1
+            print(f'{e}\nTry again: {count}')
     bot.openChart()

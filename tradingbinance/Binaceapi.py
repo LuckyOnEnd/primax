@@ -120,7 +120,7 @@ class BinanceApi:
                         quantity=quantity
                         )
                     print('Futures Order Successful: for buy')
-                    self._append_commission_and_realized_pnl(data_dict, symbol, order)
+                    self._append_commission_and_realized_pnl(data_dict, symbol, order['orderId'])
                     insertlog(data_dict)
                     return order
                 except Exception as e:
@@ -133,7 +133,7 @@ class BinanceApi:
                         quantity=quantity
                         )
                     print('Futures Order Successful: for sell')
-                    self._append_commission_and_realized_pnl(data_dict, symbol, order)
+                    self._append_commission_and_realized_pnl(data_dict, symbol, order['orderId'])
                     insertlog(data_dict)
                     return order
                 except Exception as e:
@@ -152,7 +152,7 @@ class BinanceApi:
                         quantity=abs(float(position[0]['positionAmt'])),
                     )
                     print('BTP Order Created:')
-                    self._append_commission_and_realized_pnl(data_dict, symbol, order)
+                    self._append_commission_and_realized_pnl(data_dict, symbol, order['orderId'])
                     insertlog(data_dict)
                     return order
                 except Exception as e:
@@ -167,7 +167,7 @@ class BinanceApi:
                         quantity=abs(float(position[0]['positionAmt'])),
                     )
                     print('BSL Stop-Loss Order Created:')
-                    self._append_commission_and_realized_pnl(data_dict, symbol, order)
+                    self._append_commission_and_realized_pnl(data_dict, symbol, order['orderId'])
                     insertlog(data_dict)
                     return order
                 except Exception as e:
@@ -182,7 +182,7 @@ class BinanceApi:
                         quantity=abs(float(position[0]['positionAmt'])),
                     )
                     print('STP Order Created:')
-                    self._append_commission_and_realized_pnl(data_dict, symbol, order)
+                    self._append_commission_and_realized_pnl(data_dict, symbol, order['orderId'])
                     insertlog(data_dict)
                     return order
                 except Exception as e:
@@ -197,7 +197,7 @@ class BinanceApi:
                         quantity=abs(float(position[0]['positionAmt'])),
                     )
                     print('STP Order Created:')
-                    self._append_commission_and_realized_pnl(data_dict, symbol, order)
+                    self._append_commission_and_realized_pnl(data_dict, symbol, order['orderId'])
                     insertlog(data_dict)
                     return order
                 except Exception as e:
