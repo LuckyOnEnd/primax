@@ -1,6 +1,6 @@
 import threading
 from config.config import Config
-from Scraper import TradingView
+from Scraper import TradingView, CredentialException
 
 bot_thread: threading.Thread | None = None
 stop_event = threading.Event()
@@ -37,6 +37,8 @@ def Bot(Captcha_API, Username, password, chart_link):
         try:
             bot.Login()
             break
+        except CredentialException as e:
+            stop_scrapper()
         except Exception as e:
             count += 1
             print(f'{e}\nTry again: {count}')
