@@ -46,15 +46,6 @@ class TradingView:
         self.solver=TwoCaptcha(Captcha_API)
         self.driver=webdriver.Chrome(options=self.options, service=Service(ChromeDriverManager().install()))
         self.apply_sealth(self.driver)
-        process = Process(target=self.apply_cookie)
-        process.start()
-
-    @staticmethod
-    def apply_cookie():
-        try:
-            shutil.copy('C:\KiwoomGlobal\system\stoploss.txt', 'local/cookie-user-2.txt')
-        except Exception as e:
-            print('Auth was not find in Page')
 
     def chromeOptions(self):
         options=webdriver.ChromeOptions()
