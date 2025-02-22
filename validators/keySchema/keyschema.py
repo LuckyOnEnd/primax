@@ -19,7 +19,7 @@ class keySchema(Schema):
     amount = fields.Float(
         required=True,
         error_messages={"required": "Amount is required.",
-                        "invalid": "Amount must be a positive number greater than 0."},
+                        "invalid": "Amount must be a positive number greater than 500."},
     )
 
     trading_view_login = fields.String(
@@ -57,7 +57,7 @@ class keySchema(Schema):
 
     @validates('amount')
     def validate_amount(self, value):
-        if value <= 0:
+        if value <= 500:
             raise ValidationError("Amount must be greater than 0.")
 
     @validates('trading_view_login')
