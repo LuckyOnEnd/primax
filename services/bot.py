@@ -37,9 +37,11 @@ def Bot(Captcha_API, Username, password, chart_link):
         try:
             bot.Login()
             break
-        except CredentialException as e:
-            stop_scrapper()
         except Exception as e:
             count += 1
             print(f'{e}\nTry again: {count}')
+
+    if count == 10:
+        stop_scrapper()
+        return
     bot.openChart()

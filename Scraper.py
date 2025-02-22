@@ -145,13 +145,13 @@ class TradingView:
                 self.call_enter_credentials()
                 sleep(5)
                 try:
-                    error_text = WebDriverWait(self.driver, 10).until(
+                    WebDriverWait(self.driver, 10).until(
                         EC.visibility_of_element_located(
                             (By.XPATH,
-                             '//span[contains(text(), "Invalid password.")]'
-                             )
+                             '//span[contains(text(), "Invalid username or password")]')
                         )
                     )
+
                     raise CredentialException('Authorize was not success')
                 except TimeoutException:
                     pass
