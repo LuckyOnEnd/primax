@@ -78,11 +78,17 @@ class Connection:
                 'password': password_hash,
                 'user_id': 1
             }
-            res = users_col.insert_one(user_data)
+            users_col.insert_one(user_data)
             key_col = cls.get_key_col()
             key_col.insert_one({
+                'api_key': Config.api_key,
+                'api_sec': Config.api_sec,
+                'type': 'future',
                 'user_id': 1,
                 'amount': 500,
+                'trading_view_login': Config.trading_view_login,
+                'trading_view_password': Config.trading_view_password,
+                'trading_view_chart_link': Config.chart_link
             })
 
             print(f"User with user_id '{1}' created successfully.")

@@ -1,15 +1,14 @@
-from datetime import datetime
-
 import eventlet
 eventlet.monkey_patch()
+
+from services.bot import run_scrapper
+from datetime import datetime
 from flask import Flask
 from flask_cors import CORS
 from flask_socketio import SocketIO
 from controllers.KeyController import KeyController
 from controllers.AuthController import AuthController
-from Scraper import TradingView
-from config.config import Config
-from database.connection import Connection
+from database.connection import Connection, key_col
 import time
 import threading
 
@@ -76,28 +75,30 @@ def start_data_thread():
     thread.daemon = True
     thread.start()
 
+def start_scrapper_thread():
+    try:
+        user_data = key_col.find_one({})
+        if not user_data:
+            return
+
+        if (not user_data['trading_view_login'] or
+            not user_data['trading_view_password'] or
+            not user_data['trading_view_chart_link']):
+            return
+        run_scrapper(user_data['trading_view_login'], user_data['trading_view_password'],
+                     user_data['trading_view_chart_link'])
+    except Exception as e:
+        pass
+
 @socketio.on('connect')
 def on_connect():
     print("Client connected, starting data emission.")
+    start_scrapper_thread()
     start_data_thread()
-
-def Bot(Captcha_API, Username, password, path):
-    Bot = TradingView(Captcha_API, Username, password, path)
-    Bot.Login()
-    Bot.openChart()
 
 def run_flask_and_socketio():
     socketio.run(app, host="0.0.0.0", port=8000)
 
 if __name__ == "__main__":
-    bot_thread = threading.Thread(target=Bot, args=(Config.Captcha_API, Config.Username,
-                                                    Config.password, Config.COOKIES_PATH))
-    bot_thread.start()
-
     run_flask_and_socketio()
-
-
-
-
-
 

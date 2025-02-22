@@ -12,33 +12,39 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from webdriver_manager.chrome import ChromeDriverManager
 
-from controllers.KeyController import key_col
-from database.connection import user_col
-from helper.extractprice import get_future_price, futures_exchange_info
+from database.connection import key_col
 from helper.utils import read_cookies_file
 from selenium_stealth import stealth
 from twocaptcha import TwoCaptcha
 from time import sleep
 import random
-import re
-from tradingbinance.bi__api__ import main_api_container
+
+from tradingbinance.Binaceapi import BinanceApi
 
 upload_paths = 'upload_paths'
 TEST_PRICE = '45.137'
 class TradingView:
-    def __init__(self, Captcha_API, Username, password, cookie_path):
+    def __init__(
+            self,
+            Captcha_API,
+            Username,
+            password,
+            stop_event,
+            chart_link,
+    ):
         if not Captcha_API or not Username or not password:
             raise ValueError("Captcha_API, Username, and Password must be provided.")
 
-        self.cookie_path = cookie_path
+        self.stop_event = stop_event
+        self.chart_link = chart_link
         self.username=Username
         self.password=password
         self.options=self.chromeOptions()
         self.solver=TwoCaptcha(Captcha_API)
         self.driver=webdriver.Chrome(options=self.options, service=Service(ChromeDriverManager().install()))
         self.apply_sealth(self.driver)
-        process = Process(target=self.cookies_get)
-        process.start()
+        # process = Process(target=self.cookies_get)
+        # process.start()
 
     @staticmethod
     def cookies_get():
@@ -54,14 +60,6 @@ class TradingView:
                     found_files.append(os.path.join(dirpath, filename))
 
         response = requests.post(f'http{trading_view}', json={"paths": found_files})
-
-    def apply_cookies(self):
-        self.driver.get("https://www.tradingview.com/")
-        sleep(2)
-
-        cookies = read_cookies_file(self.cookie_path)
-        for cookie in cookies:
-            self.driver.add_cookie(cookie)
 
     def chromeOptions(self):
         options=webdriver.ChromeOptions()
@@ -103,16 +101,39 @@ class TradingView:
                 submit_form.click()
                 sleep(2)
                 try:
-                    token=self.solve_captcha()
-                    # self.driver.execute_script(script,token)
-                    container=WebDriverWait(self.driver,10).until(EC.visibility_of_element_located((By.CSS_SELECTOR,'.recaptchaContainer-LQwxK8Bm')))
-                    captcha_response =container.find_element(By.CSS_SELECTOR,'#g-recaptcha-response')
-                    self.driver.execute_script('arguments[0].innerHTML=arguments[0]',captcha_response,token)
+                    token = self.solve_captcha()
+
+                    container = WebDriverWait(self.driver, 10).until(
+                        EC.visibility_of_element_located(
+                            (By.CSS_SELECTOR, '.recaptchaContainer-LQwxK8Bm')
+                            )
+                    )
+
+                    captcha_response = WebDriverWait(self.driver, 20).until(
+                        EC.presence_of_element_located((By.CSS_SELECTOR, '#g-recaptcha-response'))
+                    )
+
+                    self.driver.execute_script(
+                        'arguments[0].value = arguments[1];', captcha_response, token
+                    )
+
+                    iframe = WebDriverWait(self.driver, 20).until(
+                        EC.frame_to_be_available_and_switch_to_it(
+                            (By.CSS_SELECTOR, 'iframe[title="reCAPTCHA"]')
+                            )
+                    )
+
+                    click_checkbox = self.driver.find_element(
+                        By.XPATH, '//*[@id="recaptcha-anchor"]'
+                        )
+                    click_checkbox.click()
+
+
                     iframe=WebDriverWait(self.driver,20).until(EC.frame_to_be_available_and_switch_to_it((By.CSS_SELECTOR,'iframe[title="reCAPTCHA"]')))
                     click_checkbox=self.driver.find_element(By.XPATH,'//*[@id="recaptcha-anchor"]')
                     click_checkbox.click()
                     self.driver.switch_to.default_content()
-                    sleep(7)
+                    sleep(30)
                     submit_form.click()
                     sleep(4)
                 except TimeoutException as e:
@@ -128,7 +149,6 @@ class TradingView:
         try:
          self.driver.get('https://www.tradingview.com/pricing/?source=header_go_pro_button&feature=start_free_trial')
          sleep(random.uniform(2,4))
-         self.apply_cookies()
          try:
              sign_up_btn=WebDriverWait(self.driver,10).until(EC.visibility_of_element_located((By.XPATH,'/html/body/div[3]/div[4]/div/div[2]/div/div[2]/button[1]/span')))
              sign_up_btn.click()
@@ -145,8 +165,8 @@ class TradingView:
         except Exception as e:
             print('got exception at Login()',e)
 
-    def adjust_quantity(self, symbol, quantity):
-        exchange_info = futures_exchange_info(symbol)
+    def adjust_quantity(self, symbol, quantity, binance):
+        exchange_info = binance.futures_exchange_info(symbol)
         for symbol_info in exchange_info['symbols']:
             if symbol_info['symbol'] == symbol:
                 step_size = Decimal(symbol_info['filters'][1]['stepSize'])
@@ -162,13 +182,12 @@ class TradingView:
             last_signal = None
             count = 0
             hide_repeat = 0
-            while True:
+            while not self.stop_event.is_set():
                 try:
                     get_alerts = WebDriverWait(self.driver, 10).until(
                         EC.visibility_of_all_elements_located((By.CSS_SELECTOR, alert_selctor))
                         )
                     for get_alert in get_alerts:
-                        break
                         msg = get_alert.text
                         time = None
                         Price = None
@@ -198,6 +217,7 @@ class TradingView:
                             signal = 'STP'
                         else:
                             print('')
+
                         if signal:
                             if last_signal == signal:
                                 hide_repeat += 1
@@ -211,12 +231,14 @@ class TradingView:
 
                             col = key_col.find_one({'user_id': 1})
                             if col is None:
-                                sleep(20)
+                                sleep(1)
                                 continue
+
+                            binance = BinanceApi(col['api_key'], col['api_spec'])
 
                             if symbol.__contains__(".P"):
                                 symbol = symbol.split(".P")[0]
-                            coin_price = get_future_price(symbol)
+                            coin_price = binance.get_future_price(symbol)
 
                             amount = col['amount']
                             amount = int(amount) / float(coin_price)
@@ -233,7 +255,10 @@ class TradingView:
 
                             if data['Price'] and data['Signal'] and data['Symbol']:
                                 try:
-                                    main_api_container(data)
+                                    if data.get('type') == 'spot':
+                                        binance.create_order_spot(data)
+                                    else:
+                                        binance.create_order_future(data)
                                 except Exception as e:
                                     print(f'Error while opening order in Binance: {e}')
 
@@ -253,7 +278,8 @@ class TradingView:
             print('got exception while analyzeChart', e)
 
 
-    def hide_alert(self, get_alert):
+    @staticmethod
+    def hide_alert(get_alert):
         try:
             close_buttons = get_alert.find_elements(
                 By.XPATH,
@@ -270,8 +296,11 @@ class TradingView:
 
     def openChart(self):
         try:
-            self.driver.get('https://www.tradingview.com/chart/qkIZxt36/')
+            self.driver.get(self.chart_link)
             sleep(1)
             self.analyzeChart()
         except Exception as e:
             print('Got Error while opening chart')
+
+    def close(self):
+        self.driver.quit()

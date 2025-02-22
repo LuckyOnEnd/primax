@@ -3,6 +3,7 @@ import sys
 
 from auth.decorator import token_required
 from database.connection import key_col
+from services.bot import run_scrapper, stop_scrapper
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(SCRIPT_DIR))
@@ -23,14 +24,23 @@ class KeyController:
             if request.method != 'POST':
                 return jsonify({'message': 'Such method not allowed', 'success': False}), 404
             data = request.json
-            
+            need_to_restart = False
             try:
                 validate_data = api_key_schema.load(data)
-                print(validate_data)
                 existing_doc = key_col.find_one({'user_id': current_user['user_id']})
-                print(existing_doc)   
+
                 if existing_doc:
+                    if (existing_doc['trading_view_login'] != data['trading_view_login'] or
+                        existing_doc['trading_view_password'] != data['trading_view_password'] or
+                        existing_doc['trading_view_chart_link'] != data['trading_view_chart_link']
+                    ):
+                        need_to_restart = True
                     key_col.update_one({"user_id": existing_doc['user_id']}, {"$set": data})
+
+                    if need_to_restart:
+                        stop_scrapper()
+                        run_scrapper(data['trading_view_login'], data['trading_view_password'], data['trading_view_chart_link'])
+
                     return jsonify({
                         'message': 'API Key Updated',
                         'data': validate_data,

@@ -7,6 +7,7 @@ from werkzeug.security import check_password_hash
 
 from auth.decorator import SECRET_KEY, token_required
 from database.connection import key_col, user_col
+from services.bot import run_scrapper, stop_scrapper
 from validators.auth.authSchema import AuthSchema
 
 
@@ -51,6 +52,15 @@ class AuthController:
                     SECRET_KEY,
                     algorithm="HS256"
                 )
+
+                user_data = key_col.find_one({"user_id": existing_doc["user_id"]})
+                if user_data and user_data['trading_view_login'] and user_data['trading_view_password'] and user_data['trading_view_chart_link']:
+                    stop_scrapper()
+                    run_scrapper(
+                        user_data['trading_view_login'],
+                        user_data['trading_view_password'],
+                        user_data['trading_view_chart_link']
+                    )
 
                 return jsonify(
                     {

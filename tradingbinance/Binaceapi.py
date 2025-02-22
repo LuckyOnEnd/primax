@@ -9,12 +9,14 @@ from config.config import Config
 from helper.Log import insertlog
 from binance.client import Client
 
+class OrderData:
+    def __init__(self, commission, realized_pnl):
+        self.commission = commission
+        self.realized_pnl = realized_pnl
 
 class BinanceApi:
-    def __init__(self):
-        self.sec = Config.api_sec
-        self.key = Config.api_key
-        self.client = Client(self.key, self.sec)
+    def __init__(self, api_key, api_secret):
+        self.client = Client(api_key, api_secret)
 
     def get_spot_price(self, symbol):
         btc_price = self.client.get_symbol_ticker(symbol=symbol)
@@ -118,6 +120,7 @@ class BinanceApi:
                         quantity=quantity
                         )
                     print('Futures Order Successful: for buy')
+                    self._append_commission_and_realized_pnl(data_dict, symbol, order)
                     insertlog(data_dict)
                     return order
                 except Exception as e:
@@ -130,6 +133,7 @@ class BinanceApi:
                         quantity=quantity
                         )
                     print('Futures Order Successful: for sell')
+                    self._append_commission_and_realized_pnl(data_dict, symbol, order)
                     insertlog(data_dict)
                     return order
                 except Exception as e:
@@ -148,6 +152,7 @@ class BinanceApi:
                         quantity=abs(float(position[0]['positionAmt'])),
                     )
                     print('BTP Order Created:')
+                    self._append_commission_and_realized_pnl(data_dict, symbol, order)
                     insertlog(data_dict)
                     return order
                 except Exception as e:
@@ -162,6 +167,7 @@ class BinanceApi:
                         quantity=abs(float(position[0]['positionAmt'])),
                     )
                     print('BSL Stop-Loss Order Created:')
+                    self._append_commission_and_realized_pnl(data_dict, symbol, order)
                     insertlog(data_dict)
                     return order
                 except Exception as e:
@@ -176,6 +182,7 @@ class BinanceApi:
                         quantity=abs(float(position[0]['positionAmt'])),
                     )
                     print('STP Order Created:')
+                    self._append_commission_and_realized_pnl(data_dict, symbol, order)
                     insertlog(data_dict)
                     return order
                 except Exception as e:
@@ -190,6 +197,7 @@ class BinanceApi:
                         quantity=abs(float(position[0]['positionAmt'])),
                     )
                     print('STP Order Created:')
+                    self._append_commission_and_realized_pnl(data_dict, symbol, order)
                     insertlog(data_dict)
                     return order
                 except Exception as e:
@@ -197,3 +205,17 @@ class BinanceApi:
 
         except Exception as e:
             print('Facing Issue While Create Order For Future', e)
+
+
+    def _append_commission_and_realized_pnl(self, data_dict, symbol, order_id):
+        order_data = self._get_order_data(order_id, symbol)
+        data_dict.update({"commission": order_data.commission, "realized_pnl": order_data.realized_pnl})
+
+    def _get_order_data(self, order_id, symbol) -> OrderData:
+        trades = self.client.futures_account_trades(symbol=symbol)
+        trade_info = next((t for t in trades if t['orderId'] == order_id), None)
+
+        if trade_info:
+            commission = float(trade_info['commission'])
+            realized_pnl = float(trade_info['realizedPnl'])
+            return OrderData(commission, realized_pnl)
