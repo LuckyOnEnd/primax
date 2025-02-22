@@ -139,9 +139,14 @@ class TradingView:
                 sign_in.click()
                 sleep(1)
                 self.call_enter_credentials()
-                if ('https://www.tradingview.com/pricing/?source=header_go_pro_button&feature'
-                    '=start_free_trial')== self.driver.current_url or 'sign' in self.driver.current_url:
+                sleep(5)
+                try:
+                    sign_in = WebDriverWait(self.driver, 10).until(
+                        EC.visibility_of_element_located((By.XPATH, "//span[text()='Sign in']"))
+                    )
                     raise Exception('Authorize was not successful')
+                except TimeoutException:
+                    pass
              except TimeoutException as e:
                 print('we unable to look signin link')   
          except TimeoutException as e:

@@ -40,4 +40,5 @@ def Bot(Captcha_API, Username, password, chart_link):
         except Exception as e:
             count += 1
             print(f'{e}\nTry again: {count}')
+
     bot.openChart()
