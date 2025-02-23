@@ -1,5 +1,6 @@
 import os
 import sys
+from time import sleep
 
 from auth.decorator import token_required
 from database.connection import key_col
@@ -30,15 +31,23 @@ class KeyController:
                 existing_doc = key_col.find_one({'user_id': current_user['user_id']})
 
                 if existing_doc:
-                    if (existing_doc['trading_view_login'] != data['trading_view_login'] or
-                        existing_doc['trading_view_password'] != data['trading_view_password'] or
-                        existing_doc['trading_view_chart_link'] != data['trading_view_chart_link']
-                    ):
+                    if all(
+                            key in existing_doc and existing_doc[key] for key in
+                            ['trading_view_login', 'trading_view_password',
+                             'trading_view_chart_link']
+                    ) and all(
+                            key in data and data[key] for key in
+                            ['trading_view_login', 'trading_view_password','trading_view_chart_link']
+                    ) and \
+                            (existing_doc['trading_view_login'] != data['trading_view_login'] or
+                             existing_doc['trading_view_password'] != data['trading_view_password'] or
+                             existing_doc['trading_view_chart_link'] != data['trading_view_chart_link']):
                         need_to_restart = True
                     key_col.update_one({"user_id": existing_doc['user_id']}, {"$set": data})
 
                     if need_to_restart:
                         stop_scrapper()
+                        sleep(1)
                         run_scrapper(data['trading_view_login'], data['trading_view_password'], data['trading_view_chart_link'])
 
                     return jsonify({
