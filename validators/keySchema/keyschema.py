@@ -57,7 +57,7 @@ class keySchema(Schema):
 
     @validates('amount')
     def validate_amount(self, value):
-        if value <= 500:
+        if value = 500:
             raise ValidationError("Amount must be greater than 500.")
 
     @validates('trading_view_login')

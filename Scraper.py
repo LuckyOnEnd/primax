@@ -228,6 +228,10 @@ class TradingView:
                             signal = 'BTP'
                         elif 'STP Signal'.lower() in msg.lower():
                             signal = 'STP'
+                        elif 'BSL Signal'.lower() in msg.lower():
+                            signal = 'BSL'
+                        elif 'SSL Signal'.lower() in msg.lower():
+                            signal = 'SSL'
                         else:
                             print('')
 
@@ -290,7 +294,7 @@ class TradingView:
                     sleep(1)
                     
         except Exception as e:
-            print('got exception while analyzeChart', e)
+            pass
 
 
     @staticmethod
