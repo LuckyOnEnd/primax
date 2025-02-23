@@ -126,7 +126,7 @@ class BinanceApi:
                     insertlog(data_dict)
                     return order
                 except Exception as e:
-                    print('Got Expection in future create order', e)
+                    print(f'{datetime.utcnow()} Exception in future create order', e)
 
             elif 'sell' in signal:
                 try:
@@ -139,7 +139,7 @@ class BinanceApi:
                     insertlog(data_dict)
                     return order
                 except Exception as e:
-                    print('Got Expection in future create order sell ', e)
+                    print(f'{datetime.utcnow()} Exception in future create order sell ', e)
 
             position = self.client.futures_position_information(symbol=symbol)
             if len(position) < 1:
@@ -159,7 +159,7 @@ class BinanceApi:
                     insertlog(data_dict)
                     return order
                 except Exception as e:
-                    print('got an expenstion in future btp trade', e)
+                    print(f'{datetime.utcnow()} Exception in future btp trade', e)
 
             if 'bsl' in signal:
                 try:
@@ -174,7 +174,7 @@ class BinanceApi:
                     insertlog(data_dict)
                     return order
                 except Exception as e:
-                    print('Error in creating BSL stop-loss order', e)
+                    print(f'{datetime.utcnow()} Error in creating BSL stop-loss order', e)
 
             if 'stp' in signal:
                 try:
@@ -189,7 +189,7 @@ class BinanceApi:
                     insertlog(data_dict)
                     return order
                 except Exception as e:
-                    print('got an expenstion in future stp trade', e)
+                    print(f'{datetime.utcnow()} Exception in future stp trade', e)
 
             if 'ssl' in signal:
                 try:
@@ -204,7 +204,7 @@ class BinanceApi:
                     insertlog(data_dict)
                     return order
                 except Exception as e:
-                    print('got an expenstion in future stp trade', e)
+                    print(f'{datetime.utcnow()} Exception in future ssl trade', e)
 
         except Exception as e:
             print('Facing Issue While Create Order For Future', e)
