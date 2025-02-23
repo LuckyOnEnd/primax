@@ -159,7 +159,7 @@ class BinanceApi:
 
             if 'btp' in signal:
                 try:
-                    if self.is_short_trade(position):
+                    if self.is_short_trade(position[0]):
                         return
 
                     order = self._close_buy_order(symbol, position[0]['positionAmt'])
@@ -172,7 +172,7 @@ class BinanceApi:
 
             if 'bsl' in signal:
                 try:
-                    if self.is_short_trade(position):
+                    if self.is_short_trade(position[0]):
                         return
 
                     order = self._close_buy_order(symbol, position[0]['positionAmt'])
@@ -183,7 +183,7 @@ class BinanceApi:
                 except Exception as e:
                     print(f'{datetime.utcnow()} Error in creating BSL stop-loss order', e)
 
-            if not self.is_short_trade(position):
+            if not self.is_short_trade(position[0]):
                 return
 
             if 'stp' in signal:
