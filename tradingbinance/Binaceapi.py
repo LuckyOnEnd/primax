@@ -127,13 +127,13 @@ class BinanceApi:
                         symbol=symbol, side=Client.SIDE_BUY, type=Client.FUTURE_ORDER_TYPE_MARKET,
                         quantity=quantity
                         )
-                    print('Futures Order Successful: for buy')
+                    print(f'Futures Order Successful: for buy {datetime.now()}')
                     self._append_commission_and_realized_pnl(data_dict, symbol, order['orderId'])
                     insertlog(data_dict)
                     sleep(1)
                     return order
                 except Exception as e:
-                    print(f'{datetime.utcnow()} Exception in future create order', e)
+                    print(f'{datetime.now()} Exception in future create order', e)
 
             elif 'sell' in signal:
                 try:
@@ -145,7 +145,7 @@ class BinanceApi:
                         symbol=symbol, side=Client.SIDE_SELL, type=Client.FUTURE_ORDER_TYPE_MARKET,
                         quantity=quantity
                         )
-                    print('Futures Order Successful: for sell')
+                    print(f'Futures Order Successful: for sell {datetime.now()}')
                     self._append_commission_and_realized_pnl(data_dict, symbol, order['orderId'])
                     insertlog(data_dict)
                     sleep(1)
@@ -163,7 +163,7 @@ class BinanceApi:
                         return
 
                     order = self._close_buy_order(symbol, position[0]['positionAmt'])
-                    print('BTP Order Created:')
+                    print(f'BTP Order Created: {datetime.now()}')
                     self._append_commission_and_realized_pnl(data_dict, symbol, order['orderId'])
                     insertlog(data_dict)
                     return order
@@ -176,7 +176,7 @@ class BinanceApi:
                         return
 
                     order = self._close_buy_order(symbol, position[0]['positionAmt'])
-                    print('BSL Stop-Loss Order Created:')
+                    print(f'BSL Stop-Loss Order Created: {datetime.now()}')
                     self._append_commission_and_realized_pnl(data_dict, symbol, order['orderId'])
                     insertlog(data_dict)
                     return order
@@ -189,7 +189,7 @@ class BinanceApi:
             if 'stp' in signal:
                 try:
                     order = self._close_sell_order(symbol, position[0]['positionAmt'])
-                    print('STP Order Created:')
+                    print(f'STP Order Created: {datetime.now()}')
                     self._append_commission_and_realized_pnl(data_dict, symbol, order['orderId'])
                     insertlog(data_dict)
                     return order
@@ -200,7 +200,7 @@ class BinanceApi:
                 try:
 
                     order = self._close_sell_order(symbol, position[0]['positionAmt'])
-                    print('SSL Order Created:')
+                    print(f'SSL Order Created: {datetime.now()}')
                     self._append_commission_and_realized_pnl(data_dict, symbol, order['orderId'])
                     insertlog(data_dict)
                     return order
