@@ -236,6 +236,7 @@ class TradingView:
                                 hide_repeat += 1
                                 if hide_repeat == 30:
                                     self.hide_alert(get_alert)
+                                    sleep(1)
                                     hide_repeat = 0
                                 continue
 
@@ -276,6 +277,7 @@ class TradingView:
                                     print(f'Error while opening order in Binance: {e}')
 
                         self.hide_alert(get_alert)
+                        sleep(1)
                         continue
                 except StaleElementReferenceException as e:
                     continue

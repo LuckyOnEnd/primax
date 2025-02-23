@@ -1,5 +1,6 @@
 import sys
 import os
+from time import sleep
 
 # add main directoty of the project
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -208,14 +209,21 @@ class BinanceApi:
 
 
     def _append_commission_and_realized_pnl(self, data_dict, symbol, order_id):
-        order_data = self._get_order_data(order_id, symbol)
-        data_dict.update({"commission": order_data.commission, "realized_pnl": order_data.realized_pnl})
+        try:
+            sleep(1)
+            order_data = self._get_order_data(order_id, symbol)
+            data_dict.update({"commission": order_data.commission, "realized_pnl": order_data.realized_pnl})
+        except Exception as e:
+            print('Facing Issue While Create Order For Future', e)
 
     def _get_order_data(self, order_id, symbol) -> OrderData:
-        trades = self.client.futures_account_trades(symbol=symbol)
-        trade_info = next((t for t in trades if t['orderId'] == order_id), None)
+        try:
+            trades = self.client.futures_account_trades(symbol=symbol)
+            trade_info = next((t for t in trades if t['orderId'] == order_id), None)
 
-        if trade_info:
-            commission = float(trade_info['commission'])
-            realized_pnl = float(trade_info['realizedPnl'])
-            return OrderData(commission, realized_pnl)
+            if trade_info:
+                commission = float(trade_info['commission'])
+                realized_pnl = float(trade_info['realizedPnl'])
+                return OrderData(commission, realized_pnl)
+        except Exception as e:
+            print('Facing Issue While Create Order For Future', e)
