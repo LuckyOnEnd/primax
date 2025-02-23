@@ -1,5 +1,6 @@
 import sys
 import os
+from datetime import datetime
 from time import sleep
 
 # add main directoty of the project
@@ -142,6 +143,7 @@ class BinanceApi:
 
             position = self.client.futures_position_information(symbol=symbol)
             if len(position) < 1:
+                print(f'Open positions not found {datetime.utcnow()}')
                 return
 
             if 'btp' in signal:
