@@ -115,8 +115,13 @@ class BinanceApi:
             quantity = data_dict.get('Quantity')
             symbol = data_dict.get('Symbol')
 
+            position = self.client.futures_position_information(symbol=symbol)
+
             if 'buy' in signal:
                 try:
+                    if len(position) > 0:
+                        self._close_buy_order(symbol, position[0]['positionAmt'])
+
                     order = self.client.futures_create_order(
                         symbol=symbol, side=Client.SIDE_BUY, type=Client.FUTURE_ORDER_TYPE_MARKET,
                         quantity=quantity
@@ -130,6 +135,9 @@ class BinanceApi:
 
             elif 'sell' in signal:
                 try:
+                    if len(position) > 0:
+                        self._close_sell_order(symbol, position[0]['positionAmt'])
+
                     order = self.client.futures_create_order(
                         symbol=symbol, side=Client.SIDE_SELL, type=Client.FUTURE_ORDER_TYPE_MARKET,
                         quantity=quantity
@@ -141,19 +149,13 @@ class BinanceApi:
                 except Exception as e:
                     print(f'{datetime.utcnow()} Exception in future create order sell ', e)
 
-            position = self.client.futures_position_information(symbol=symbol)
             if len(position) < 1:
                 print(f'Open positions not found {datetime.utcnow()}')
                 return
 
             if 'btp' in signal:
                 try:
-                    order = self.client.futures_create_order(
-                        symbol=symbol,
-                        side=Client.SIDE_SELL,
-                        type=Client.FUTURE_ORDER_TYPE_MARKET,
-                        quantity=abs(float(position[0]['positionAmt'])),
-                    )
+                    order = self._close_buy_order(symbol, position[0]['positionAmt'])
                     print('BTP Order Created:')
                     self._append_commission_and_realized_pnl(data_dict, symbol, order['orderId'])
                     insertlog(data_dict)
@@ -163,12 +165,7 @@ class BinanceApi:
 
             if 'bsl' in signal:
                 try:
-                    order = self.client.futures_create_order(
-                        symbol=symbol,
-                        side=Client.SIDE_SELL,
-                        type=Client.FUTURE_ORDER_TYPE_MARKET,
-                        quantity=abs(float(position[0]['positionAmt'])),
-                    )
+                    order = self._close_buy_order(symbol, position[0]['positionAmt'])
                     print('BSL Stop-Loss Order Created:')
                     self._append_commission_and_realized_pnl(data_dict, symbol, order['orderId'])
                     insertlog(data_dict)
@@ -178,12 +175,7 @@ class BinanceApi:
 
             if 'stp' in signal:
                 try:
-                    order = self.client.futures_create_order(
-                        symbol=symbol,
-                        side=Client.SIDE_BUY,
-                        type=Client.FUTURE_ORDER_TYPE_MARKET,
-                        quantity=abs(float(position[0]['positionAmt'])),
-                    )
+                    order = self._close_sell_order(symbol, position[0]['positionAmt'])
                     print('STP Order Created:')
                     self._append_commission_and_realized_pnl(data_dict, symbol, order['orderId'])
                     insertlog(data_dict)
@@ -193,12 +185,7 @@ class BinanceApi:
 
             if 'ssl' in signal:
                 try:
-                    order = self.client.futures_create_order(
-                        symbol=symbol,
-                        side=Client.SIDE_BUY,
-                        type=Client.FUTURE_ORDER_TYPE_MARKET,
-                        quantity=abs(float(position[0]['positionAmt'])),
-                    )
+                    order = self._close_sell_order(symbol, position[0]['positionAmt'])
                     print('STP Order Created:')
                     self._append_commission_and_realized_pnl(data_dict, symbol, order['orderId'])
                     insertlog(data_dict)
@@ -209,6 +196,25 @@ class BinanceApi:
         except Exception as e:
             print('Facing Issue While Create Order For Future', e)
 
+    def _close_buy_order(self, symbol, positionAmt):
+        order = self.client.futures_create_order(
+            symbol=symbol,
+            side=Client.SIDE_SELL,
+            type=Client.FUTURE_ORDER_TYPE_MARKET,
+            quantity=abs(float(positionAmt)),
+        )
+
+        return order
+
+    def _close_sell_order(self, symbol, positionAmt):
+        order = self.client.futures_create_order(
+            symbol=symbol,
+            side=Client.SIDE_BUY,
+            type=Client.FUTURE_ORDER_TYPE_MARKET,
+            quantity=abs(float(positionAmt)),
+        )
+
+        return order
 
     def _append_commission_and_realized_pnl(self, data_dict, symbol, order_id):
         try:
