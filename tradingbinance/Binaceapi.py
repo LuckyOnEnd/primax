@@ -120,7 +120,7 @@ class BinanceApi:
             if 'buy' in signal:
                 try:
                     if len(position) > 0:
-                        self._close_buy_order(symbol, position[0]['positionAmt'])
+                        self._close_sell_order(symbol, position[0]['positionAmt'])
                         sleep(1)
 
                     order = self.client.futures_create_order(
@@ -138,7 +138,7 @@ class BinanceApi:
             elif 'sell' in signal:
                 try:
                     if len(position) > 0:
-                        self._close_sell_order(symbol, position[0]['positionAmt'])
+                        self._close_buy_order(symbol, position[0]['positionAmt'])
                         sleep(1)
 
                     order = self.client.futures_create_order(
