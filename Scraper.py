@@ -287,9 +287,11 @@ class TradingView:
                     pass
                     sleep(1)
                 except Exception as e:
-                    print(f'Exception handled: {e}')
                     sleep(1)
-                    
+                    if "element not interactable" in str(e):
+                        continue
+                    print(f'Exception handled: {e}')
+
         except Exception as e:
             pass
 
