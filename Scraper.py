@@ -184,7 +184,6 @@ class TradingView:
         try:
             alert_selctor = '.itemInnerInner-JUpQSPBo'
             last_signal = None
-            count = 0
             hide_repeat = 0
             while not self.stop_event.is_set():
                 try:
@@ -249,7 +248,6 @@ class TradingView:
 
                             col = key_col.find_one({'user_id': 1})
                             if col is None:
-                                sleep(1)
                                 continue
 
                             binance = BinanceApi(col['api_key'], col['api_sec'])
@@ -290,7 +288,6 @@ class TradingView:
                     sleep(1)
                 except Exception as e:
                     print(f'Exception handled: {e}')
-                    count += 1
                     sleep(1)
                     
         except Exception as e:
