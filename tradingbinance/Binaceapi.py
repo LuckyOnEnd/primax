@@ -121,6 +121,7 @@ class BinanceApi:
                 try:
                     if len(position) > 0:
                         self._close_buy_order(symbol, position[0]['positionAmt'])
+                        sleep(1)
 
                     order = self.client.futures_create_order(
                         symbol=symbol, side=Client.SIDE_BUY, type=Client.FUTURE_ORDER_TYPE_MARKET,
@@ -129,6 +130,7 @@ class BinanceApi:
                     print('Futures Order Successful: for buy')
                     self._append_commission_and_realized_pnl(data_dict, symbol, order['orderId'])
                     insertlog(data_dict)
+                    sleep(1)
                     return order
                 except Exception as e:
                     print(f'{datetime.utcnow()} Exception in future create order', e)
@@ -137,6 +139,7 @@ class BinanceApi:
                 try:
                     if len(position) > 0:
                         self._close_sell_order(symbol, position[0]['positionAmt'])
+                        sleep(1)
 
                     order = self.client.futures_create_order(
                         symbol=symbol, side=Client.SIDE_SELL, type=Client.FUTURE_ORDER_TYPE_MARKET,
@@ -145,6 +148,7 @@ class BinanceApi:
                     print('Futures Order Successful: for sell')
                     self._append_commission_and_realized_pnl(data_dict, symbol, order['orderId'])
                     insertlog(data_dict)
+                    sleep(1)
                     return order
                 except Exception as e:
                     print(f'{datetime.utcnow()} Exception in future create order sell ', e)
@@ -155,6 +159,9 @@ class BinanceApi:
 
             if 'btp' in signal:
                 try:
+                    if self.is_short_trade(position):
+                        return
+
                     order = self._close_buy_order(symbol, position[0]['positionAmt'])
                     print('BTP Order Created:')
                     self._append_commission_and_realized_pnl(data_dict, symbol, order['orderId'])
@@ -165,6 +172,9 @@ class BinanceApi:
 
             if 'bsl' in signal:
                 try:
+                    if self.is_short_trade(position):
+                        return
+
                     order = self._close_buy_order(symbol, position[0]['positionAmt'])
                     print('BSL Stop-Loss Order Created:')
                     self._append_commission_and_realized_pnl(data_dict, symbol, order['orderId'])
@@ -172,6 +182,9 @@ class BinanceApi:
                     return order
                 except Exception as e:
                     print(f'{datetime.utcnow()} Error in creating BSL stop-loss order', e)
+
+            if not self.is_short_trade(position):
+                return
 
             if 'stp' in signal:
                 try:
@@ -185,8 +198,9 @@ class BinanceApi:
 
             if 'ssl' in signal:
                 try:
+
                     order = self._close_sell_order(symbol, position[0]['positionAmt'])
-                    print('STP Order Created:')
+                    print('SSL Order Created:')
                     self._append_commission_and_realized_pnl(data_dict, symbol, order['orderId'])
                     insertlog(data_dict)
                     return order
@@ -195,6 +209,10 @@ class BinanceApi:
 
         except Exception as e:
             print('Facing Issue While Create Order For Future', e)
+
+    @staticmethod
+    def is_short_trade(position):
+        return position.get("positionAmt") and float(position["positionAmt"]) < 0
 
     def _close_buy_order(self, symbol, positionAmt):
         order = self.client.futures_create_order(
