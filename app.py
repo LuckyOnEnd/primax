@@ -1,4 +1,9 @@
+import json
+
 import eventlet
+
+from controllers import ReportController
+
 eventlet.monkey_patch()
 
 from services.bot import run_scrapper
@@ -25,6 +30,10 @@ def index():
 @app.route('/api/postkey', methods=['POST'])
 def post_key():
     return KeyControllers.Postkey()
+
+@app.route('/api/report', methods=['POST'])
+def get_report():
+    return ReportController.get_by_date_range()
 
 @app.route('/api/getkeys', methods=['GET'])
 def get_key():
@@ -62,13 +71,18 @@ def fetch_logs():
         print(f"Error retrieving logs: {e}")
         return []
 
-# Function to emit data periodically
+def serialize_datetime(obj):
+    if isinstance(obj, datetime):
+        return obj.isoformat()
+    raise TypeError(f"Type {type(obj)} not serializable")
+
 def send_periodic_data():
     while True:
         data_array = fetch_logs()
         if data_array:
-            socketio.emit('data', {'message': 'Data retrieved', 'data': data_array})
-        time.sleep(1)  # Emit data every second
+            serialized_data = json.loads(json.dumps(data_array, default=serialize_datetime))
+            socketio.emit('data', {'message': 'Data retrieved', 'data': serialized_data})
+        time.sleep(1)
 
 def start_data_thread():
     thread = threading.Thread(target=send_periodic_data)

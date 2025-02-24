@@ -1,11 +1,7 @@
 # importing packages
-import base64
-import os
-import shutil
+from datetime import datetime
 from decimal import Decimal, ROUND_DOWN
-from multiprocessing import Process
 
-import requests
 from selenium import webdriver
 from selenium.common.exceptions import TimeoutException,StaleElementReferenceException
 from selenium.webdriver.chrome.service import Service
@@ -266,7 +262,8 @@ class TradingView:
                                 'Symbol': symbol,
                                 'Time': time,
                                 'Signal': signal,
-                                'Quantity': float(quantity)
+                                'Quantity': float(quantity),
+                                'PositionOpened': datetime.now()
                             }
 
                             if data['Price'] and data['Signal'] and data['Symbol']:

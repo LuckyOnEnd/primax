@@ -97,4 +97,5 @@ class Connection:
 
 key_col = Connection.get_key_col()
 user_col = Connection.get_users_col()
+logs_col = Connection.get_logs_col()
 Connection.create_default_user()

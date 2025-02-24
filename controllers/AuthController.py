@@ -14,7 +14,7 @@ class AuthController:
     def auth(cls):
         try:
             if request.method != 'POST':
-                return jsonify({'message': 'Such method not allowed', 'success': False}), 405  # 405 вместо 404
+                return jsonify({'message': 'Such method not allowed', 'success': False}), 405
 
             data = request.json
 
