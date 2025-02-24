@@ -1,11 +1,7 @@
-import json
-
 import eventlet
-
-from controllers import ReportController
-
 eventlet.monkey_patch()
-
+from controllers import ReportController
+import json
 from services.bot import run_scrapper
 from datetime import datetime
 from flask import Flask
