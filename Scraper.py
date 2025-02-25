@@ -183,11 +183,12 @@ class TradingView:
             hide_repeat = 0
             while not self.stop_event.is_set():
                 try:
-                    get_alerts = WebDriverWait(self.driver, 10).until(
+                    get_alerts = WebDriverWait(self.driver, 20).until(
                         EC.visibility_of_all_elements_located((By.CSS_SELECTOR, alert_selctor))
                         )
                     for get_alert in get_alerts:
                         msg = get_alert.text
+                        print(f"\n\nAlert received: {msg}\nTime {datetime.now()}\n\n")
                         if msg == 'This website uses cookies. Our policy.\nManage\nAccept all':
                             close_buttons = get_alert.find_elements(
                                 By.XPATH,
@@ -276,6 +277,8 @@ class TradingView:
                                         binance.create_order_future(data)
                                 except Exception as e:
                                     print(f'Error while opening order in Binance: {e}')
+                            else:
+                                print(f'Order was ignored {data}\nTime: {datetime.now()}\n\n')
 
                         self.hide_alert(get_alert)
                         sleep(1)
@@ -305,7 +308,7 @@ class TradingView:
 
             if close_buttons:
                 close_buttons[-1].click()
-
+                print(f'Closed alert {datetime.now()}')
         except TimeoutException as e:
             print('Unable To Close It')
         except StaleElementReferenceException as e:
