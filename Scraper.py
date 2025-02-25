@@ -187,6 +187,7 @@ class TradingView:
                         EC.visibility_of_all_elements_located((By.CSS_SELECTOR, alert_selctor))
                         )
                     for get_alert in get_alerts:
+
                         msg = get_alert.text
                         print(f"\n\nAlert received: {msg}\nTime {datetime.now()}\n\n")
                         if msg == 'This website uses cookies. Our policy.\nManage\nAccept all':
