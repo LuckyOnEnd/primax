@@ -237,14 +237,14 @@ class TradingView:
                             if last_signal == signal:
                                 hide_repeat += 1
                                 if hide_repeat >= 10:
+                                    print(f'Last signal was receiver {signal} {datetime.now()}')
                                     self.hide_alert(get_alert)
                                     sleep(1)
                                     hide_repeat = 0
                                 sleep(1)
                                 continue
 
-                            if signal == 'Buy' or signal == 'Sell':
-                                last_signal = signal
+                            last_signal = signal
 
                             col = key_col.find_one({'user_id': 1})
                             if col is None:
