@@ -187,8 +187,8 @@ class TradingView:
                         EC.visibility_of_all_elements_located((By.CSS_SELECTOR, alert_selctor))
                         )
                     for get_alert in get_alerts:
-
                         msg = get_alert.text
+
                         print(f"\n\nAlert received: {msg}\nTime {datetime.now()}\n\n")
                         if msg == 'This website uses cookies. Our policy.\nManage\nAccept all':
                             close_buttons = get_alert.find_elements(
@@ -208,13 +208,8 @@ class TradingView:
                             time = get_time.text
                         except TimeoutException as e:
                             print('Miss Time')
-                        try:
-                            get_symbol = get_alert.find_element(
-                                By.CSS_SELECTOR, 'div.text-LoO6TyUc.ellipsis-LoO6TyUc'
-                                )
-                            symbol = get_symbol.text
-                        except TimeoutException as e:
-                            print('Miss Symbol')
+
+                        symbol_value = self.get_symbol(get_alert)
 
                         signal = None
                         if 'Buy Signal'.lower() in msg.lower():
@@ -238,7 +233,7 @@ class TradingView:
                                 hide_repeat += 1
                                 if hide_repeat >= 10:
                                     print(f'Last signal was receiver {signal} {datetime.now()}')
-                                    self.hide_alert(get_alert)
+                                    self.hide_alert(get_alert, symbol_value)
                                     sleep(1)
                                     hide_repeat = 0
                                 sleep(1)
@@ -252,8 +247,9 @@ class TradingView:
 
                             binance = BinanceApi(col['api_key'], col['api_sec'])
 
-                            if symbol.__contains__(".P"):
-                                symbol = symbol.split(".P")[0]
+                            symbol = None
+                            if symbol_value.__contains__(".P"):
+                                symbol = symbol_value.split(".P")[0]
                             coin_price = binance.get_future_price(symbol)
 
                             amount = col['amount']
@@ -281,7 +277,7 @@ class TradingView:
                             else:
                                 print(f'Order was ignored {data}\nTime: {datetime.now()}\n\n')
 
-                        self.hide_alert(get_alert)
+                        self.hide_alert(get_alert, symbol_value)
                         sleep(1)
                         continue
                 except StaleElementReferenceException as e:
@@ -298,10 +294,25 @@ class TradingView:
         except Exception as e:
             pass
 
+    @staticmethod
+    def get_symbol(get_alert):
+        try:
+            get_symbol = get_alert.find_element(
+                By.CSS_SELECTOR, 'div.text-LoO6TyUc.ellipsis-LoO6TyUc'
+            )
+            symbol = get_symbol.text
+            return symbol
+        except TimeoutException as e:
+            print('Miss Symbol')
+            return None
 
     @staticmethod
-    def hide_alert(get_alert):
+    def hide_alert(get_alert, symbol: str | None):
         try:
+            get_symbol = TradingView.get_symbol(get_alert)
+            if get_symbol and get_symbol != symbol:
+                return
+
             close_buttons = get_alert.find_elements(
                 By.XPATH,
                 "//*[contains(@class, 'closeButton-ZZzgDlel') and .//*[contains(text(), 'Close')]]"
