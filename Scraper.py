@@ -199,6 +199,7 @@ class TradingView:
                             if close_buttons:
                                 close_buttons[-1].click()
 
+                        sleep(0.5)
                         time = None
                         Price = None
                         if not msg.strip():
