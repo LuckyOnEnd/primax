@@ -59,9 +59,9 @@ class ReportController:
                     total_commission += abs(commission)
                     net_profit = total_profit - total_loss - total_commission
 
-                total_loss = round(total_loss, 5)
+                total_loss = round(-total_loss, 5)
                 total_profit = round(total_profit, 5)
-                total_commission = round(total_commission, 5)
+                total_commission = round(-total_commission, 5)
                 net_profit = round(net_profit, 5)
 
                 return jsonify(

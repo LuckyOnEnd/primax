@@ -231,9 +231,10 @@ class TradingView:
                             print('')
 
                         if signal:
+                            print(f'Received {signal} f{datetime.now()}')
                             if last_signal == signal:
                                 hide_repeat += 1
-                                if hide_repeat == 30:
+                                if hide_repeat >= 30:
                                     self.hide_alert(get_alert)
                                     sleep(1)
                                     hide_repeat = 0

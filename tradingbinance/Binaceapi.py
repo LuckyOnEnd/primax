@@ -7,7 +7,6 @@ from time import sleep
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(SCRIPT_DIR))
 # import config file
-from config.config import Config
 from helper.Log import insertlog
 from binance.client import Client
 
@@ -121,6 +120,7 @@ class BinanceApi:
                 try:
                     if len(position) > 0:
                         self._close_sell_order(symbol, position[0]['positionAmt'])
+                        print(f'Close SELL position before BUY position {datetime.now()}')
                         sleep(1)
 
                     order = self.client.futures_create_order(
@@ -139,6 +139,7 @@ class BinanceApi:
                 try:
                     if len(position) > 0:
                         self._close_buy_order(symbol, position[0]['positionAmt'])
+                        print(f'Close BUY position before SELL position {datetime.now()}')
                         sleep(1)
 
                     order = self.client.futures_create_order(
@@ -160,6 +161,7 @@ class BinanceApi:
             if 'btp' in signal:
                 try:
                     if self.is_short_trade(position[0]):
+                        print(f'Current position is SELL. Skip BTP {datetime.now()}')
                         return
 
                     order = self._close_buy_order(symbol, position[0]['positionAmt'])
@@ -173,6 +175,7 @@ class BinanceApi:
             if 'bsl' in signal:
                 try:
                     if self.is_short_trade(position[0]):
+                        print(f'Current position is SELL. Skip BSL {datetime.now()}')
                         return
 
                     order = self._close_buy_order(symbol, position[0]['positionAmt'])
@@ -184,6 +187,7 @@ class BinanceApi:
                     print(f'{datetime.utcnow()} Error in creating BSL stop-loss order', e)
 
             if not self.is_short_trade(position[0]):
+                print(f'Current position is BUY. Skip STP or SSL {datetime.now()}')
                 return
 
             if 'stp' in signal:
