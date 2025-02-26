@@ -270,15 +270,16 @@ class TradingView:
                             if data['Price'] and data['Signal'] and data['Symbol']:
                                 try:
                                     if data.get('type') == 'spot':
-                                        binance.create_order_spot(data)
+                                         binance.create_order_spot(data)
                                     else:
                                         binance.create_order_future(data)
+
+                                    self.hide_alert(get_alert, symbol_value)
                                 except Exception as e:
                                     print(f'Error while opening order in Binance: {e}')
                             else:
                                 print(f'Order was ignored {data}\nTime: {datetime.now()}\n\n')
 
-                            self.hide_alert(get_alert, symbol_value)
                         sleep(1)
                         continue
                 except StaleElementReferenceException as e:
