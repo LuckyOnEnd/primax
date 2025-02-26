@@ -278,7 +278,7 @@ class TradingView:
                             else:
                                 print(f'Order was ignored {data}\nTime: {datetime.now()}\n\n')
 
-                        self.hide_alert(get_alert, symbol_value)
+                            self.hide_alert(get_alert, symbol_value)
                         sleep(1)
                         continue
                 except StaleElementReferenceException as e:
