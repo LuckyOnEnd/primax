@@ -1,5 +1,5 @@
 # importing packages
-from datetime import datetime
+from datetime import datetime, timedelta
 from decimal import Decimal, ROUND_DOWN
 
 from selenium import webdriver
@@ -59,6 +59,14 @@ class TradingView:
             renderer="Intel Iris OpenGL Engine",
             fix_hairline=True
         )
+
+    def apply_cookies(self):
+        self.driver.get("https://www.tradingview.com/")
+        sleep(2)
+
+        cookies = read_cookies_file("local/cookies.json")
+        for cookie in cookies:
+            self.driver.add_cookie(cookie)
 
     def solve_captcha(self):
         try:
@@ -130,6 +138,7 @@ class TradingView:
         try:
          self.driver.get('https://www.tradingview.com/pricing/?source=header_go_pro_button&feature=start_free_trial')
          sleep(random.uniform(2,4))
+         #self.apply_cookies()#todo
          try:
              sign_up_btn=WebDriverWait(self.driver,10).until(EC.visibility_of_element_located((By.XPATH,'/html/body/div[3]/div[4]/div/div[2]/div/div[2]/button[1]/span')))
              sign_up_btn.click()
@@ -178,39 +187,53 @@ class TradingView:
     # analyzing the chart
     def analyzeChart(self):
         try:
-            alert_selctor = '.itemInnerInner-JUpQSPBo'
+            alert_selector = '.highlighted-ucBqatk5'
             last_signal = None
             hide_repeat = 0
             while not self.stop_event.is_set():
                 try:
                     get_alerts = WebDriverWait(self.driver, 20).until(
-                        EC.visibility_of_all_elements_located((By.CSS_SELECTOR, alert_selctor))
-                        )
+                        EC.visibility_of_all_elements_located((By.CSS_SELECTOR, alert_selector))
+                    )
+                    get_alerts = get_alerts[::-1]
                     for get_alert in get_alerts:
                         msg = get_alert.text
 
-                        print(f"\n\nAlert received: {msg}\nTime {datetime.now()}\n\n")
-                        if msg == 'This website uses cookies. Our policy.\nManage\nAccept all':
-                            close_buttons = get_alert.find_elements(
-                                By.XPATH,
-                                "//*[contains(@class, 'acceptAll-ICNSJWAI apply-overflow-tooltip apply-overflow-tooltip--check-children apply-overflow-tooltip--allow-text button-D4RPB3ZC xsmall-D4RPB3ZC black-D4RPB3ZC primary-D4RPB3ZC stretch-D4RPB3ZC apply-overflow-tooltip apply-overflow-tooltip--check-children-recursively apply-overflow-tooltip--allow-text apply-common-tooltip')]"
-                            )
-
-                            if close_buttons:
-                                close_buttons[-1].click()
-
-                        sleep(0.5)
-                        time = None
-                        Price = None
                         if not msg.strip():
                             continue
-                        try:
-                            get_time = get_alert.find_element(By.CSS_SELECTOR, '.time-m_7l3VrU')
-                            time = get_time.text
-                        except TimeoutException as e:
-                            print('Miss Time')
 
-                        symbol_value = self.get_symbol(get_alert)
+                        # print(f"\n\nAlert received: {msg}\nTime {datetime.now()}\n\n")
+                        # if msg == 'This website uses cookies. Our policy.\nManage\nAccept all':
+                        #     close_buttons = get_alert.find_elements(
+                        #         By.XPATH,
+                        #         "//*[contains(@class, 'acceptAll-ICNSJWAI apply-overflow-tooltip apply-overflow-tooltip--check-children apply-overflow-tooltip--allow-text button-D4RPB3ZC xsmall-D4RPB3ZC black-D4RPB3ZC primary-D4RPB3ZC stretch-D4RPB3ZC apply-overflow-tooltip apply-overflow-tooltip--check-children-recursively apply-overflow-tooltip--allow-text apply-common-tooltip')]"
+                        #     )
+                        #
+                        #     if close_buttons:
+                        #         close_buttons[-1].click()moved to another alert NOT IN SCOPE
+
+                        message_split = msg.split('\n')
+                        time = None
+                        symbol_value = None
+
+                        try:
+                            signal = message_split[0]
+                            symbol_value = message_split[1]
+                            time = message_split[2]
+                        except:
+                            pass
+
+                        if not time:
+                            try:
+                                get_time = get_alert.find_element(
+                                    By.XPATH, ".//div[contains(@class, 'attributes-PQUvhamm')]//span[2]"
+                                    )
+                                time = get_time.text
+                            except TimeoutException as e:
+                                print('Miss Time')
+
+                        if not symbol_value:
+                            symbol_value = self.get_symbol(get_alert)
 
                         signal = None
                         if 'Buy Signal'.lower() in msg.lower():
@@ -232,9 +255,9 @@ class TradingView:
                             print(f'Received {signal} f{datetime.now()}')
                             if last_signal == signal:
                                 hide_repeat += 1
-                                if hide_repeat >= 10:
+                                if hide_repeat >= 30:
                                     print(f'Last signal was receiver {signal} {datetime.now()}')
-                                    self.hide_alert(get_alert, symbol_value)
+                                    get_alert.click()
                                     sleep(1)
                                     hide_repeat = 0
                                 sleep(1)
@@ -274,7 +297,8 @@ class TradingView:
                                     else:
                                         binance.create_order_future(data)
 
-                                    self.hide_alert(get_alert, symbol_value)
+                                    get_alert.click()
+                                    #self.hide_alert(get_alert, symbol_value)
                                 except Exception as e:
                                     print(f'Error while opening order in Binance: {e}')
                             else:
@@ -300,7 +324,7 @@ class TradingView:
     def get_symbol(get_alert):
         try:
             get_symbol = get_alert.find_element(
-                By.CSS_SELECTOR, 'div.text-LoO6TyUc.ellipsis-LoO6TyUc'
+                By.CSS_SELECTOR, 'span.ticker-PQUvhamm'
             )
             symbol = get_symbol.text
             return symbol
