@@ -198,11 +198,10 @@ class TradingView:
                     get_alerts = get_alerts[::-1]
                     for get_alert in get_alerts:
                         msg = get_alert.text
-
                         if not msg.strip():
                             continue
 
-                        # print(f"\n\nAlert received: {msg}\nTime {datetime.now()}\n\n")
+                        print(f"\n\nAlert received: {msg}\nTime {datetime.now()}\n\n")
                         # if msg == 'This website uses cookies. Our policy.\nManage\nAccept all':
                         #     close_buttons = get_alert.find_elements(
                         #         By.XPATH,
@@ -210,7 +209,7 @@ class TradingView:
                         #     )
                         #
                         #     if close_buttons:
-                        #         close_buttons[-1].click()moved to another alert NOT IN SCOPE
+                        #         close_buttons[-1].click()
 
                         message_split = msg.split('\n')
                         time = None
@@ -255,10 +254,10 @@ class TradingView:
                             print(f'Received {signal} f{datetime.now()}')
                             if last_signal == signal:
                                 hide_repeat += 1
-                                if hide_repeat >= 30:
+                                if hide_repeat >= 10:
                                     print(f'Last signal was receiver {signal} {datetime.now()}')
                                     get_alert.click()
-                                    sleep(1)
+                                    self.driver.find_element(By.TAG_NAME, 'body').click()
                                     hide_repeat = 0
                                 sleep(1)
                                 continue
@@ -297,7 +296,9 @@ class TradingView:
                                     else:
                                         binance.create_order_future(data)
 
+
                                     get_alert.click()
+                                    self.driver.find_element(By.TAG_NAME, 'body').click()
                                     #self.hide_alert(get_alert, symbol_value)
                                 except Exception as e:
                                     print(f'Error while opening order in Binance: {e}')

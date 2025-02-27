@@ -122,7 +122,6 @@ class BinanceApi:
                         self._close_sell_order(symbol, position[0]['positionAmt'])
                         print(f'Close SELL position before BUY position {datetime.now()}')
                         sleep(1)
-
                     order = self.client.futures_create_order(
                         symbol=symbol, side=Client.SIDE_BUY, type=Client.FUTURE_ORDER_TYPE_MARKET,
                         quantity=quantity
