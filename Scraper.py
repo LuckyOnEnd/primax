@@ -259,7 +259,6 @@ class TradingView:
                                     get_alert.click()
                                     self.driver.find_element(By.TAG_NAME, 'body').click()
                                     hide_repeat = 0
-                                sleep(1)
                                 continue
 
                             last_signal = signal
