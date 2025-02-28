@@ -197,6 +197,7 @@ class TradingView:
                     )
                     get_alerts = get_alerts[::-1]
                     for get_alert in get_alerts:
+                        break
                         msg = get_alert.text
                         if not msg.strip():
                             continue
@@ -256,9 +257,14 @@ class TradingView:
                                 hide_repeat += 1
                                 if hide_repeat >= 10:
                                     print(f'Last signal was receiver {signal} {datetime.now()}')
-                                    get_alert.click()
-                                    self.driver.find_element(By.TAG_NAME, 'body').click()
-                                    hide_repeat = 0
+                                    try:
+                                        get_alert.click()
+                                        self.driver.find_element(By.TAG_NAME, 'body').click()
+                                        hide_repeat = 0
+                                    except ElementClickInterceptedException:
+                                        print("Element click intercepted! Refreshing the page...")
+                                        self.driver.refresh()
+                                        hide_repeat = 0
                                 continue
 
                             last_signal = signal
@@ -295,9 +301,12 @@ class TradingView:
                                     else:
                                         binance.create_order_future(data)
 
-
-                                    get_alert.click()
-                                    self.driver.find_element(By.TAG_NAME, 'body').click()
+                                    try:
+                                        get_alert.click()
+                                        self.driver.find_element(By.TAG_NAME, 'body').click()
+                                    except ElementClickInterceptedException:
+                                        print("Element click intercepted! Refreshing the page...")
+                                        self.driver.refresh()
                                     #self.hide_alert(get_alert, symbol_value)
                                 except Exception as e:
                                     print(f'Error while opening order in Binance: {e}')
