@@ -27,6 +27,10 @@ def index():
 def post_key():
     return KeyControllers.Postkey()
 
+@app.route('/api/close_positions', methods=['POST'])
+def close_positions():
+    return KeyControllers.close_positions()
+
 @app.route('/api/report', methods=['POST'])
 def get_report():
     return ReportController.get_by_date_range()

@@ -217,6 +217,30 @@ class BinanceApi:
     def is_short_trade(position):
         return position.get("positionAmt") and float(position["positionAmt"]) < 0
 
+    def close_all_positions(self):
+        try:
+            account_info = self.client.futures_account()
+            positions = account_info['positions']
+
+            for position in positions:
+                symbol = position['symbol']
+                position_amt = float(position['positionAmt'])
+
+                if position_amt != 0:
+                    side = Client.SIDE_SELL if position_amt > 0 else Client.SIDE_BUY
+                    order = self.client.futures_create_order(
+                        symbol=symbol,
+                        side=side,
+                        type=Client.FUTURE_ORDER_TYPE_MARKET,
+                        quantity=abs(position_amt)
+                    )
+                    print(f"Position closed {symbol}, counts: {position_amt}")
+
+            print("All order is closed")
+
+        except Exception as e:
+            print(f"Error while closing order: {e}")
+
     def _close_buy_order(self, symbol, positionAmt):
         order = self.client.futures_create_order(
             symbol=symbol,

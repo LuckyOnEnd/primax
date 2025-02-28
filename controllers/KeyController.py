@@ -5,6 +5,7 @@ from time import sleep
 from auth.decorator import token_required
 from database.connection import key_col
 from services.bot import run_scrapper, stop_scrapper
+from tradingbinance.Binaceapi import BinanceApi
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(SCRIPT_DIR))
@@ -18,6 +19,19 @@ from bson import ObjectId
 api_key_schema=keySchema()
 
 class KeyController:
+
+    @classmethod
+    @token_required
+    def close_positions(cls, current_user):
+        try:
+            existing_doc = key_col.find_one({'user_id': current_user['user_id']})
+
+            binance = BinanceApi(existing_doc['api_key'], existing_doc['api_sec'])
+            binance.close_all_positions()
+        except Exception as e:
+            print(e)
+
+
     @classmethod
     @token_required
     def Postkey(cls, current_user):
