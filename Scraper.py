@@ -307,6 +307,7 @@ class TradingView:
                                     except ElementClickInterceptedException:
                                         print("Element click intercepted! Refreshing the page...")
                                         self.driver.refresh()
+
                                     #self.hide_alert(get_alert, symbol_value)
                                 except Exception as e:
                                     print(f'Error while opening order in Binance: {e}')
