@@ -28,8 +28,21 @@ class KeyController:
 
             binance = BinanceApi(existing_doc['api_key'], existing_doc['api_sec'])
             binance.close_all_positions()
+            return jsonify(
+                {
+                    'message': 'Positions closed',
+                    'data': 'Ok',
+                    'success': True
+                }
+            ), 200
         except Exception as e:
-            print(e)
+            return jsonify(
+                {
+                    'message': 'Error while closing positions',
+                    'data': e.args,
+                    'success': True
+                }
+            ), 200
 
 
     @classmethod
