@@ -197,7 +197,6 @@ class TradingView:
                     )
                     get_alerts = get_alerts[::-1]
                     for get_alert in get_alerts:
-                        break
                         msg = get_alert.text
                         if not msg.strip():
                             continue
