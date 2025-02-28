@@ -3,7 +3,10 @@ from datetime import datetime, timedelta
 from decimal import Decimal, ROUND_DOWN
 
 from selenium import webdriver
-from selenium.common.exceptions import TimeoutException,StaleElementReferenceException
+from selenium.common.exceptions import (
+    TimeoutException, StaleElementReferenceException,
+    ElementClickInterceptedException
+)
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
