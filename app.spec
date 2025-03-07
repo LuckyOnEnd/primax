@@ -1,19 +1,47 @@
-# -*- mode: python ; coding: utf-8 -*-
-
-
 a = Analysis(
     ['app.py'],
     pathex=[],
     binaries=[],
-    datas=[],
-    hiddenimports=[],
+    datas=[
+        ('controllers/*.py', 'controllers'),
+        ('auth/*.py', 'auth'),
+        ('Scraper.py', '.'),
+        ('services/*.py', 'services'),
+        ('helper/*.py', 'helper'),
+        ('database/*.py', 'database'),
+        ('config/*.py', 'config'),
+        ('tradingbinance/*.py', 'tradingbinance'),
+        ('init_eventlet.py', '.')
+    ],
+    hiddenimports=[
+        'eventlet.hubs.epolls', 'eventlet.hubs.kqueue', 'eventlet.hubs.selects',
+        'dns', 'dns.dnssec', 'dns.e164', 'dns.hash', 'dns.versioned', 'dns.namedict',
+        'dns.tsigkeyring', 'dns.update', 'dns.version', 'dns.zone', 'jwt', 'pymongo',
+        'selenium', 'aiohappyeyeballs', 'aiohttp', 'aiosignal', 'altgraph', 'attrs',
+        'beautifulsoup4', 'bidict', 'binance', 'blinker', 'certifi', 'cffi',
+        'charset_normalizer', 'click', 'cryptography', 'dateparser', 'dnspython',
+        'eventlet', 'Flask', 'Flask-Cors', 'Flask-SocketIO', 'frozenlist', 'gevent',
+        'gevent-websocket', 'greenlet', 'h11', 'idna', 'itsdangerous', 'Jinja2',
+        'macholib', 'MarkupSafe', 'marshmallow', 'multidict', 'outcome', 'packaging',
+        'playwright', 'propcache', 'pycparser', 'pycryptodome', 'pyee', 'pyinstaller',
+        'pyinstaller-hooks-contrib', 'PyJWT', 'PySocks', 'python-binance',
+        'selenium.webdriver.support.ui', 'webdriver_manager',
+        'python-dateutil', 'python-dotenv', 'python-engineio', 'python-socketio',
+        'pytz', 'regex', 'requests', 'selenium-stealth', 'selenium', 'selenium.common', 'setuptools',
+        'simple-websocket', 'six', 'sniffio', 'sortedcontainers', 'soupsieve', 'trio',
+        'selenium.webdriver.chrome', 'selenium.webdriver.support',
+        'selenium.webdriver.support.expected_conditions',
+        'trio-websocket', 'TwoCaptcha', 'typing_extensions', 'tzlocal', 'urllib3',
+        'webdriver-manager', 'websocket-client', 'websockets', 'Werkzeug', 'wsproto',
+        'yarl', 'zope.event', 'zope.interface'
+    ],
     hookspath=[],
     hooksconfig={},
-    runtime_hooks=[],
+    runtime_hooks=['init_eventlet.py'],
     excludes=[],
     noarchive=False,
-    optimize=0,
 )
+
 pyz = PYZ(a.pure)
 
 exe = EXE(

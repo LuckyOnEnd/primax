@@ -15,6 +15,11 @@ cryptography==44.0.1
 dateparser==1.2.1
 dnspython==2.7.0
 eventlet==0.39.1
+selenium.common
+pipenv
+selenium.webdriver.support
+selenium.webdriver.support.ui
+webdriver_manager
 Flask==3.1.0
 Flask-Cors==5.0.0
 Flask-SocketIO==5.5.1
