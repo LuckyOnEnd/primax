@@ -1,17 +1,21 @@
-import eventlet
-eventlet.monkey_patch()
-from controllers import ReportController
+import gevent
+from gevent import monkey
+monkey.patch_all()
+
+import os
+import sys
 import json
-from services.bot import run_scrapper
+import time
+import threading
 from datetime import datetime
 from flask import Flask
 from flask_cors import CORS
 from flask_socketio import SocketIO
 from controllers.KeyController import KeyController
 from controllers.AuthController import AuthController
+from controllers import ReportController
 from database.connection import Connection, key_col
-import time
-import threading
+from services.bot import run_scrapper
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
@@ -113,7 +117,6 @@ def run_flask_and_socketio():
     socketio.run(app, host="0.0.0.0", port=8000)
 
 if __name__ == "__main__":
+    eventlet.monkey_patch()
     start_scrapper_thread()
     run_flask_and_socketio()
-
-
