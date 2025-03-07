@@ -11,7 +11,6 @@ a = Analysis(
         ('database/*.py', 'database'),
         ('config/*.py', 'config'),
         ('tradingbinance/*.py', 'tradingbinance'),
-        ('init_eventlet.py', '.')
     ],
     hiddenimports=[
         'eventlet.hubs.epolls', 'eventlet.hubs.kqueue', 'eventlet.hubs.selects',
@@ -33,11 +32,11 @@ a = Analysis(
         'selenium.webdriver.support.expected_conditions',
         'trio-websocket', 'TwoCaptcha', 'typing_extensions', 'tzlocal', 'urllib3',
         'webdriver-manager', 'websocket-client', 'websockets', 'Werkzeug', 'wsproto',
-        'yarl', 'zope.event', 'zope.interface'
+        'yarl', 'zope.event', 'zope.interface', 'gevent'
     ],
     hookspath=[],
     hooksconfig={},
-    runtime_hooks=['init_eventlet.py'],
+    runtime_hooks=[],
     excludes=[],
     noarchive=False,
 )
