@@ -1,4 +1,3 @@
-# importing packages
 from datetime import datetime, timedelta
 from decimal import Decimal, ROUND_DOWN
 

@@ -1,6 +1,5 @@
-import gevent
-from gevent import monkey
-monkey.patch_all()
+import eventlet
+eventlet.monkey_patch()
 
 import os
 import sys
@@ -117,6 +116,5 @@ def run_flask_and_socketio():
     socketio.run(app, host="0.0.0.0", port=8000)
 
 if __name__ == "__main__":
-    eventlet.monkey_patch()
     start_scrapper_thread()
     run_flask_and_socketio()
