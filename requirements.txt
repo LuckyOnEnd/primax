@@ -20,6 +20,7 @@ pipenv
 selenium.webdriver.support
 selenium.webdriver.support.ui
 webdriver_manager
+gevent
 Flask==3.1.0
 Flask-Cors==5.0.0
 Flask-SocketIO==5.5.1
