@@ -19,8 +19,7 @@ def token_required(f):
         try:
             token = token.split("Bearer ")[-1]
             data = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
-            current_user = user_col.find_one({"user_id": int(data["user_id"])})
-
+            current_user = user_col.find_one({"email": data["user_id"]})
             if not current_user:
                 return jsonify({'message': 'User not found', 'success': False}), 401
 

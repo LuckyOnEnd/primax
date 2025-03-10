@@ -189,6 +189,7 @@ class TradingView:
     # analyzing the chart
     def analyzeChart(self):
         try:
+            return #todo
             alert_selector = '.highlighted-ucBqatk5'
             last_signal = None
             hide_repeat = 0

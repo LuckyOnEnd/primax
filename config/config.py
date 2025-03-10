@@ -4,7 +4,7 @@ load_dotenv()
 
 class Config:
 
-    Captcha_API = os.getenv('twocaptchaKey')
+    Captcha_API = '20889fecf36a0d81df702d81119d8f03'
     Username = os.getenv('username')
     password = os.getenv('password')
     api_key = os.getenv('Binacekey')

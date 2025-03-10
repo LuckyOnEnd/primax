@@ -1,8 +1,8 @@
+import socket
+
 import eventlet
 eventlet.monkey_patch()
 
-import os
-import sys
 import json
 import time
 import threading
@@ -67,7 +67,7 @@ def fetch_logs():
         result = logs_col.find()
         data_array = []
         for doc in result:
-            doc['_id'] = str(doc['_id'])  # Convert ObjectId to string
+            doc['_id'] = str(doc['_id'])
             data_array.append(doc)
         return data_array
     except Exception as e:
@@ -97,7 +97,6 @@ def start_scrapper_thread():
         user_data = key_col.find_one({})
         if not user_data:
             return
-
         if (user_data.get('trading_view_login') in [None, ''] or
                 user_data.get('trading_view_password') in [None, ''] or
                 user_data.get('trading_view_chart_link') in [None, '']):
@@ -116,5 +115,4 @@ def run_flask_and_socketio():
     socketio.run(app, host="0.0.0.0", port=8000)
 
 if __name__ == "__main__":
-    start_scrapper_thread()
     run_flask_and_socketio()

@@ -23,21 +23,12 @@ class keySchema(Schema):
     )
 
     trading_view_login = fields.String(
-        required=True,
-        validate=lambda x: len(x) > 0,
-        error_messages={"required": "TradingView Id is required."},
     )
 
     trading_view_password = fields.String(
-        required=True,
-        validate=lambda x: len(x) > 0,
-        error_messages={"required": "TradingView Password is required."},
     )
 
     trading_view_chart_link = fields.String(
-        required=True,
-        validate=lambda x: len(x) > 0,
-        error_messages={"required": "Chart link is required."},
     )
 
     @validates('type')
