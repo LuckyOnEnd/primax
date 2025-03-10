@@ -1,13 +1,14 @@
+import eventlet
+eventlet.monkey_patch()
 import os
+import websockets.legacy
+import websockets.legacy.client
 import subprocess
 import time
 import socket
 import json
 import threading
 from datetime import datetime
-
-import eventlet
-eventlet.monkey_patch()
 
 from flask import Flask
 from flask_cors import CORS
@@ -19,10 +20,10 @@ from database.connection import Connection, key_col
 from services.bot import run_scrapper
 
 def start_mongodb():
-    """Запускает локальный сервер MongoDB перед запуском основного приложения."""
     try:
-        current_dir = os.path.dirname(os.path.abspath(__file__))  # Папка, где лежит exe
+        current_dir = os.path.dirname(os.path.abspath(__file__))
         mongodb_path = os.path.join(current_dir, "mongodb", "bin", "mongod.exe")
+        print(f"Путь к MongoDB: {mongodb_path}")
         db_path = os.path.join(current_dir, "mongodb", "data")
 
         if not os.path.exists(db_path):
@@ -32,7 +33,6 @@ def start_mongodb():
         time.sleep(5)
         return process
     except Exception as e:
-        print(f"Ошибка запуска MongoDB: {e}")
         return None
 
 mongo_process = start_mongodb()
