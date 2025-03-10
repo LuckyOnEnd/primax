@@ -1,12 +1,14 @@
+import os
+import subprocess
+import time
 import socket
+import json
+import threading
+from datetime import datetime
 
 import eventlet
 eventlet.monkey_patch()
 
-import json
-import time
-import threading
-from datetime import datetime
 from flask import Flask
 from flask_cors import CORS
 from flask_socketio import SocketIO
@@ -15,6 +17,25 @@ from controllers.AuthController import AuthController
 from controllers import ReportController
 from database.connection import Connection, key_col
 from services.bot import run_scrapper
+
+def start_mongodb():
+    """Запускает локальный сервер MongoDB перед запуском основного приложения."""
+    try:
+        current_dir = os.path.dirname(os.path.abspath(__file__))  # Папка, где лежит exe
+        mongodb_path = os.path.join(current_dir, "mongodb", "bin", "mongod.exe")
+        db_path = os.path.join(current_dir, "mongodb", "data")
+
+        if not os.path.exists(db_path):
+            os.makedirs(db_path)
+
+        process = subprocess.Popen([mongodb_path, "--dbpath", db_path], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        time.sleep(5)
+        return process
+    except Exception as e:
+        print(f"Ошибка запуска MongoDB: {e}")
+        return None
+
+mongo_process = start_mongodb()
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
@@ -55,12 +76,10 @@ def sort_by_time(data_array):
         try:
             entry['Time'] = datetime.strptime(entry['Time'], '%H:%M:%S')
         except ValueError:
-            entry['Time'] = None  # Handle cases where time is empty or invalid
-
+            entry['Time'] = None
     sorted_data = sorted(data_array, key=lambda x: x['Time'] or datetime.min, reverse=True)
     return sorted_data
 
-# Function to fetch logs from DB
 def fetch_logs():
     try:
         logs_col = Connection.get_logs_col()
@@ -71,13 +90,13 @@ def fetch_logs():
             data_array.append(doc)
         return data_array
     except Exception as e:
-        print(f"Error retrieving logs: {e}")
+        print(f"Ошибка получения логов: {e}")
         return []
 
 def serialize_datetime(obj):
     if isinstance(obj, datetime):
         return obj.isoformat()
-    raise TypeError(f"Type {type(obj)} not serializable")
+    raise TypeError(f"Тип {type(obj)} не сериализуется")
 
 def send_periodic_data():
     while True:
@@ -104,11 +123,11 @@ def start_scrapper_thread():
         run_scrapper(user_data['trading_view_login'], user_data['trading_view_password'],
                      user_data['trading_view_chart_link'])
     except Exception as e:
-        pass
+        print(f"Ошибка в боте: {e}")
 
 @socketio.on('connect')
 def on_connect():
-    print("Client connected, starting data emission.")
+    print("Клиент подключился, запускаем поток передачи данных.")
     start_data_thread()
 
 def run_flask_and_socketio():
