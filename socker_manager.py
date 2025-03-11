@@ -21,7 +21,7 @@ stop_event = threading.Event()
 
 def connect_to_websocket_server(email, password, binance_key, binance_secret, type):
     global stop_event
-    uri = "ws://localhost:8001/ws"
+    uri = "ws://45.80.181.3:8001/ws"
 
     while not stop_event.is_set():
         try:
