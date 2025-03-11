@@ -18,7 +18,7 @@ class Config:
     trading_view_password = os.getenv("TRADING_VIEW_PASSWORD")
     chart_link = os.getenv("CHART_LINK")
 
-    mongoUri = os.getenv("MONGODB_URI")
+    mongoUri = 'mongodb://localhost:27017'
 
     COOKIES_PATH = 'local/cookies.json'
 

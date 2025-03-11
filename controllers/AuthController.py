@@ -24,7 +24,7 @@ class AuthController:
             try:
                 validate_data = AuthSchema().load(data)
                 response = requests.post(
-                    f'http://127.0.0.1:8001/auth?username='
+                    f'https://api.primexalgo.com/auth?username='
                     f'{data['user_id']}&password={data['password']}')
                 response.raise_for_status()
                 token = response.json()
