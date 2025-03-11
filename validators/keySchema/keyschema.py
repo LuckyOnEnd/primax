@@ -15,6 +15,7 @@ class keySchema(Schema):
         error_messages={"required": "API secret is required."},
     )
     type = fields.String(required=True, error_messages={"required": "Type is invalid."})
+    signal_type = fields.String()
 
     amount = fields.Float(
         required=True,
@@ -51,17 +52,3 @@ class keySchema(Schema):
         if value < 5:#todo only for testing
             raise ValidationError("Amount must be greater than 5.")
 
-    @validates('trading_view_login')
-    def validate_trading_view_login(self, value):
-        if len(value) < 3:
-            raise ValidationError("TradingView Id needs to contain at least 3 characters.")
-
-    @validates('trading_view_password')
-    def validate_trading_view_password(self, value):
-        if len(value) < 3:
-            raise ValidationError("TradingView Password needs to contain at least 3 characters.")
-
-    @validates('trading_view_chart_link')
-    def validate_trading_view_chart_link(self, value):
-        if len(value) < 3:
-            raise ValidationError("Chart link needs to contain at least 3 characters.")
