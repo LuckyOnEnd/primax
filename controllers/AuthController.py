@@ -75,18 +75,18 @@ class AuthController:
                 binance_api = keys_data.get('api_key')
                 binance_sec = keys_data.get('api_sec')
 
-                if token['data']['subscription_type'] == 'essential':
-                    if binance_api and binance_sec:
-                        start_local_socket_thread(
-                            validate_data['user_id'],
-                            validate_data['password'],
-                            binance_api,
-                            binance_sec,
-                            keys_data.get('type', None),
-                        )
-                elif token['data']['subscription_type'] == 'premium':
-                    run_scrapper(keys_data['trading_view_login'], keys_data[
-                        'trading_view_password'], keys_data['trading_view_chart_link'])
+                #if token['data']['subscription_type'] == 'essential':
+                if binance_api and binance_sec:#onlt for test
+                    start_local_socket_thread(
+                        validate_data['user_id'],
+                        validate_data['password'],
+                        binance_api,
+                        binance_sec,
+                        keys_data.get('type', None),
+                    )
+                # elif token['data']['subscription_type'] == 'premium':
+                #     run_scrapper(keys_data['trading_view_login'], keys_data[
+                #         'trading_view_password'], keys_data['trading_view_chart_link'])
 
                 return jsonify(
                     {
