@@ -48,10 +48,12 @@ def connect_to_websocket_server(email, password, binance_key, binance_secret, ty
 
                         quantity = adjust_quantity(data['Symbol'], amount, binance_api)
                         data['Quantity'] = float(quantity)
+                        coin_price = binance_api.get_future_price(data['Symbol'])
+                        data['Price'] = coin_price
                         if type == 'future':
-                                binance_api.create_order_future(data)
+                            binance_api.create_order_future(data)
                         else:
-                                binance_api.create_order_spot(data)
+                            binance_api.create_order_spot(data)
                 except json.JSONDecodeError:
                     print(f"📩 Получена строка: {message}")
 
