@@ -1,8 +1,32 @@
 from pymongo import MongoClient
 import certifi
 from werkzeug.security import generate_password_hash
-
+import time
 from config.config import Config
+import os
+import subprocess
+
+def start_mongodb():
+    try:
+        current_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        print(f"Current dir: {current_dir}")
+
+        mongodb_path = os.path.join(current_dir, "mongodb", "bin", "mongod.exe")
+        print(f"Mongo Path: {mongodb_path}")
+        db_path = os.path.join(current_dir, "mongodb", "data")
+
+        if not os.path.exists(db_path):
+            print('Creating database directory...')
+            os.makedirs(db_path)
+
+        print('Starting MongoDB...')
+        process = subprocess.Popen([mongodb_path, "--dbpath", db_path], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        time.sleep(5)
+        return process
+    except Exception as e:
+        print(e)
+        return None
+
 
 class Connection:
     _client = None
@@ -15,6 +39,7 @@ class Connection:
     def get_client(cls):
         if cls._client is None:
             try:
+                start_mongodb()
                 print("Attempting to connect to MongoDB...")
                 ca = certifi.where()
                 cls._client = MongoClient(Config.mongoUri)

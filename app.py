@@ -9,7 +9,11 @@ import socket
 import json
 import threading
 from datetime import datetime
-
+from selenium.common import exceptions
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions
+import websockets.legacy
+from websockets.legacy.client import WebSocketClientProtocol
 from flask import Flask
 from flask_cors import CORS
 from flask_socketio import SocketIO
@@ -18,24 +22,6 @@ from controllers.AuthController import AuthController
 from controllers import ReportController
 from database.connection import Connection, key_col
 from services.bot import run_scrapper
-
-def start_mongodb():
-    try:
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        mongodb_path = os.path.join(current_dir, "mongodb", "bin", "mongod.exe")
-        print(f"Путь к MongoDB: {mongodb_path}")
-        db_path = os.path.join(current_dir, "mongodb", "data")
-
-        if not os.path.exists(db_path):
-            os.makedirs(db_path)
-
-        process = subprocess.Popen([mongodb_path, "--dbpath", db_path], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        time.sleep(5)
-        return process
-    except Exception as e:
-        return None
-
-mongo_process = start_mongodb()
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
