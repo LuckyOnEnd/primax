@@ -70,12 +70,18 @@ class Connection:
 
             cursor.execute(
                 '''
-                CREATE TABLE IF NOT EXISTS logs (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-                    message TEXT
-                )
-            '''
+                            CREATE TABLE IF NOT EXISTS logs (
+                                type TEXT,
+                                Price REAL,
+                                Symbol TEXT,
+                                Time TEXT,
+                                Signal TEXT,
+                                Quantity REAL,
+                                PositionOpened DATETIME,
+                                commission REAL,
+                                realized_pnl REAL
+                            )
+                        '''
                 )
             cls._conn.commit()
             print("Database tables created or verified.")

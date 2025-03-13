@@ -11,16 +11,31 @@ def insertlog(data):
         cursor = Connection.get_cursor()
         conn = Connection.get_connection()
 
-        query = "INSERT INTO logs (message) VALUES (?)"
-        cursor.execute(query, (data.get('message'),))
+        query = """
+            INSERT INTO logs (
+                type, Price, Symbol, Time, Signal, Quantity, 
+                PositionOpened, commission, realized_pnl
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """
+        values = (
+            data.get('type'),
+            data.get('Price'),
+            data.get('Symbol'),
+            data.get('Time'),
+            data.get('Signal'),
+            data.get('Quantity'),
+            data.get('PositionOpened'),
+            data.get('commission'),
+            data.get('realized_pnl')
+        )
+
+        cursor.execute(query, values)
         conn.commit()
 
         class InsertResult:
-            def __init__(self, id):
-                self.inserted_id = id
+            pass
 
-        last_id = cursor.lastrowid
-        return InsertResult(last_id)
+        return InsertResult()
 
     except Exception as e:
         print('got exception as ', e)
