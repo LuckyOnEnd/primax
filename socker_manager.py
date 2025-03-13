@@ -8,7 +8,7 @@ from flask import Flask
 from flask_cors import CORS
 from flask_socketio import SocketIO
 
-from database.connection import key_col
+from database.connection import Connection
 from tradingbinance.Binaceapi import BinanceApi
 
 app = Flask(__name__)
@@ -17,7 +17,6 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 
 socket_thread: threading.Thread = None
 stop_event = threading.Event()
-
 
 def connect_to_websocket_server(email, password, binance_key, binance_secret, type):
     global stop_event
@@ -39,11 +38,18 @@ def connect_to_websocket_server(email, password, binance_key, binance_secret, ty
                 try:
                     data = json.loads(message)
                     if isinstance(data, dict) and 'Symbol' in data:
-                        col = key_col.find_one({'email': email})
+                        cursor = Connection.get_cursor()
+                        cursor.execute("SELECT * FROM keyCollection WHERE email = ?", (email,))
+                        col = cursor.fetchone()
+
+                        if not col:
+                            print(f"No key found for email: {email}")
+                            continue
+
                         binance_api = BinanceApi(api_key=binance_key, api_secret=binance_secret)
                         coin_price = binance_api.get_future_price(data['Symbol'])
 
-                        amount = col['amount']
+                        amount = col[5]
                         amount = int(amount) / float(coin_price)
 
                         quantity = adjust_quantity(data['Symbol'], amount, binance_api)
