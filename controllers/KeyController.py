@@ -76,7 +76,7 @@ class KeyController:
                         'trading_view_chart_link': existing_doc[8],
                         'api_key': existing_doc[1],
                         'api_sec': existing_doc[2],
-                        'type': existing_doc[3],
+                        'order_type': existing_doc[3],
                         'email': existing_doc[4]
                     }
 
@@ -99,7 +99,7 @@ class KeyController:
                     # Обновление записи
                     update_query = """
                         UPDATE keyCollection 
-                        SET api_key = ?, api_sec = ?, type = ?, amount = ?, 
+                        SET api_key = ?, api_sec = ?, order_type = ?, amount = ?, 
                             trading_view_login = ?, trading_view_password = ?, 
                             trading_view_chart_link = ?, subscription_type = ?
                         WHERE email = ?
@@ -108,7 +108,7 @@ class KeyController:
                         update_query, (
                             data.get('api_key', existing_doc[1]),
                             data.get('api_sec', existing_doc[2]),
-                            data.get('type', existing_doc[3]),
+                            data.get('order_type', existing_doc[3]),
                             data.get('amount', existing_doc[5]),
                             data.get('trading_view_login', existing_doc[6]),
                             data.get('trading_view_password', existing_doc[7]),
@@ -145,7 +145,7 @@ class KeyController:
                 else:
                     insert_query = """
                         INSERT INTO keyCollection (
-                            api_key, api_sec, type, email, amount,
+                            api_key, api_sec, order_type, email, amount,
                             trading_view_login, trading_view_password, trading_view_chart_link,
                             subscription_type
                         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -154,7 +154,7 @@ class KeyController:
                         insert_query, (
                             data.get('api_key'),
                             data.get('api_sec'),
-                            data.get('type'),
+                            data.get('order_type'),
                             current_user['email'],
                             data.get('amount', 0),
                             data.get('trading_view_login'),
@@ -205,7 +205,7 @@ class KeyController:
                     '_id': str(result[0]),
                     'api_key': result[1],
                     'api_sec': result[2],
-                    'type': result[3],
+                    'order_type': result[3],
                     'email': result[4],
                     'amount': result[5],
                     'trading_view_login': result[6],
@@ -247,7 +247,7 @@ class KeyController:
 
             update_query = """
                 UPDATE keyCollection 
-                SET api_key = ?, api_sec = ?, type = ?, amount = ?, 
+                SET api_key = ?, api_sec = ?, order_type = ?, amount = ?, 
                     trading_view_login = ?, trading_view_password = ?, 
                     trading_view_chart_link = ?, subscription_type = ?
                 WHERE id = ?
@@ -256,7 +256,7 @@ class KeyController:
                 update_query, (
                     data.get('api_key'),
                     data.get('api_sec'),
-                    data.get('type'),
+                    data.get('order_type'),
                     data.get('amount'),
                     data.get('trading_view_login'),
                     data.get('trading_view_password'),

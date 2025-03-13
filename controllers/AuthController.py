@@ -46,7 +46,7 @@ class AuthController:
                     cursor.execute(
                         """
                         INSERT INTO keyCollection (
-                            email, subscription_type, type, 
+                            email, subscription_type, order_type, 
                             trading_view_chart_link, trading_view_login, trading_view_password
                         ) VALUES (?, ?, ?, ?, ?, ?)
                     """, (

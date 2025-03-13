@@ -65,7 +65,7 @@ class Connection:
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     api_key TEXT,
                     api_sec TEXT,
-                    type TEXT,
+                    order_type TEXT,
                     email TEXT NOT NULL,
                     amount REAL,
                     trading_view_login TEXT,
@@ -80,7 +80,7 @@ class Connection:
             cursor.execute(
                 '''
                             CREATE TABLE IF NOT EXISTS logs (
-                                type TEXT,
+                                order_type TEXT,
                                 Price REAL,
                                 Symbol TEXT,
                                 Time TEXT,
@@ -115,7 +115,7 @@ class Connection:
                 cursor.execute(
                     """
                     INSERT INTO keyCollection (
-                        api_key, api_sec, type, email, amount,
+                        api_key, api_sec, order_type, email, amount,
                         trading_view_login, trading_view_password, 
                         trading_view_chart_link, subscription_type
                     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)

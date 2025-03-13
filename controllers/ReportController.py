@@ -3,8 +3,7 @@ from datetime import datetime
 from flask import request, jsonify
 from marshmallow import Schema, fields, validates, ValidationError
 
-from database.connection import logs_col
-
+from database.connection import Connection
 
 class ReportSchema(Schema):
     from_date = fields.DateTime(
@@ -14,7 +13,6 @@ class ReportSchema(Schema):
         required=True,
     )
 
-
 class ReportController:
     @classmethod
     def get_by_date_range(cls):
@@ -22,23 +20,25 @@ class ReportController:
             if request.method != 'POST':
                 return jsonify(
                     {'message': 'Such method not allowed', 'success': False}
-                    ), 405
+                ), 405
 
             data = request.json
 
             try:
                 validate_data = ReportSchema().load(data)
 
-                result = list(
-                    logs_col.find(
-                        {
-                            "PositionOpened": {
-                                "$gte": validate_data['from_date'],
-                                "$lte": validate_data['to_date']
-                            }
-                        }
-                    )
-                )
+                cursor = Connection.get_cursor()
+                # Предполагаем, что PositionOpened хранится в формате DATETIME (YYYY-MM-DD HH:MM:SS)
+                query = """
+                    SELECT Price, commission, realized_pnl 
+                    FROM logs 
+                    WHERE PositionOpened BETWEEN ? AND ?
+                """
+                cursor.execute(query, (
+                    validate_data['from_date'].strftime('%Y-%m-%d %H:%M:%S'),
+                    validate_data['to_date'].strftime('%Y-%m-%d %H:%M:%S')
+                ))
+                result = cursor.fetchall()
 
                 total_loss = 0
                 total_profit = 0
@@ -46,13 +46,12 @@ class ReportController:
                 net_profit = 0
 
                 for order in result:
-                    realized_pnl = float(order.get('realized_pnl', 0))
-                    commission = float(order.get('commission', 0))
+                    # Структура результата: (Price, commission, realized_pnl)
+                    realized_pnl = float(order[2] or 0)  # realized_pnl
+                    commission = float(order[1] or 0)    # commission
 
                     if realized_pnl < 0:
-                        total_loss += abs(
-                            realized_pnl
-                        )
+                        total_loss += abs(realized_pnl)
                     else:
                         total_profit += realized_pnl
 
@@ -87,3 +86,10 @@ class ReportController:
 
         except Exception as ex:
             print(ex)
+            return jsonify(
+                {
+                    'message': 'Internal server error',
+                    'error': str(ex),
+                    'success': False
+                }
+            ), 500

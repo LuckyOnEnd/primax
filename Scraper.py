@@ -11,7 +11,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from webdriver_manager.chrome import ChromeDriverManager
-from database.connection import key_col
+from database.connection import key_col, Connection
 from helper.utils import read_cookies_file
 from selenium_stealth import stealth
 from twocaptcha import TwoCaptcha
@@ -187,6 +187,7 @@ class TradingView:
 
     def analyzeChart(self):
         try:
+            cursor = Connection.get_cursor()
             alert_selector = '.highlighted-ucBqatk5'
             last_signal = None
             hide_repeat = 0
@@ -268,23 +269,24 @@ class TradingView:
 
                             last_signal = signal
 
-                            col = key_col.find_one({'user_id': 1})
-                            if col is None:
+                            cursor.execute("SELECT * FROM users WHERE email = ?", (self.username,))
+                            result = cursor.fetchone()
+                            if result is None:
                                 continue
 
-                            binance = BinanceApi(col['api_key'], col['api_sec'])
+                            binance = BinanceApi(result[1], result[2])
 
                             symbol = None
                             if symbol_value.__contains__(".P"):
                                 symbol = symbol_value.split(".P")[0]
                             coin_price = binance.get_future_price(symbol)
 
-                            amount = col['amount']
+                            amount = result[5]
                             amount = int(amount) / float(coin_price)
 
                             quantity = self.adjust_quantity(symbol, amount, binance)
                             data = {
-                                'type': col["type"],
+                                'type': result[3],#todo
                                 'Price': coin_price,
                                 'Symbol': symbol,
                                 'Time': time,

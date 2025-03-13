@@ -73,21 +73,25 @@ def sort_by_time(data_array):
 def fetch_logs():
     try:
         cursor = Connection.get_cursor()
-        cursor.execute("SELECT * FROM logs")
+        cursor.execute("SELECT * FROM logs ORDER BY PositionOpened DESC")
         result = cursor.fetchall()
 
         data_array = []
         for row in result:
-            log_entry = {
-                '_id': str(row[0]),
-                'timestamp': row[1],
-                'message': row[2]
+            data = {
+                'Symbol': row[2],
+                'Price': row[1],
+                'Signal': row[4],
+                'Quantity': row[5],
+                'Type': row[0],
+                'Time': row[3],
+                'PositionOpened': row[6],
+                'commission': row[7],
+                'realized_pnl': row[8],
             }
-            data_array.append(log_entry)
+            data_array.append(data)
 
-        sorted_data = sort_by_time(data_array)
-        return sorted_data
-
+        return data_array
     except Exception as e:
         print(f"Error while getting logs: {e}")
         return []

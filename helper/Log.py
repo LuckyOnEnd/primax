@@ -13,12 +13,12 @@ def insertlog(data):
 
         query = """
             INSERT INTO logs (
-                type, Price, Symbol, Time, Signal, Quantity, 
+                order_type, Price, Symbol, Time, Signal, Quantity, 
                 PositionOpened, commission, realized_pnl
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """
         values = (
-            data.get('type'),
+            data.get('order_type'),
             data.get('Price'),
             data.get('Symbol'),
             data.get('Time'),

@@ -18,7 +18,6 @@ def token_required(f):
             token = token.split("Bearer ")[-1]
             data = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
 
-            # Используем SQLite вместо MongoDB
             cursor = Connection.get_cursor()
             cursor.execute("SELECT * FROM users WHERE email = ?", (data["user_id"],))
             current_user = cursor.fetchone()
@@ -26,10 +25,9 @@ def token_required(f):
             if not current_user:
                 return jsonify({'message': 'User not found', 'success': False}), 401
 
-            # Преобразуем результат в словарь для совместимости с предыдущим кодом
             current_user_dict = {
-                "email": current_user[0],  # Предполагаем, что email - первый столбец
-                "password": current_user[1]  # Предполагаем, что password - второй столбец
+                "email": current_user[0],
+                "password": current_user[1]
             }
 
             return f(*args, **kwargs, current_user=current_user_dict)
