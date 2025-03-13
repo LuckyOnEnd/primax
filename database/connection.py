@@ -4,12 +4,21 @@ import os
 from config.config import Config
 
 
+import os
+import sys
+
 def get_db_path():
-    current_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    if getattr(sys, "frozen", False):
+        current_dir = os.path.dirname(sys.executable)
+    else:
+        current_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
     db_path = os.path.join(current_dir, "database", "tradeview.db")
-    if not os.path.exists(os.path.dirname(db_path)):
-        os.makedirs(os.path.dirname(db_path))
+
+    os.makedirs(os.path.dirname(db_path), exist_ok=True)
+
     return db_path
+
 
 
 class Connection:
