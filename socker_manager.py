@@ -62,7 +62,9 @@ def connect_to_websocket_server(email, password, binance_key, binance_secret, ty
                             binance_api.create_order_spot(data)
                 except json.JSONDecodeError:
                     print(f"📩 error {message}")
-
+                except Exception as e:
+                    print(e)
+                    time.sleep(5)
         except Exception as e:
             if stop_event.is_set():
                 break
