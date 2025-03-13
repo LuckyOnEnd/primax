@@ -57,26 +57,39 @@ def update_key(id):
 def authenticate_user():
     return AuthController.auth()
 
+
 def sort_by_time(data_array):
     for entry in data_array:
         try:
-            entry['Time'] = datetime.strptime(entry['Time'], '%H:%M:%S')
+            entry['timestamp'] = datetime.strptime(
+                entry['timestamp'], '%Y-%m-%d %H:%M:%S'
+                )
         except ValueError:
-            entry['Time'] = None
-    sorted_data = sorted(data_array, key=lambda x: x['Time'] or datetime.min, reverse=True)
+            entry['timestamp'] = None
+    sorted_data = sorted(data_array, key=lambda x: x['timestamp'] or datetime.min, reverse=True)
     return sorted_data
+
 
 def fetch_logs():
     try:
-        logs_col = Connection.get_logs_col()
-        result = logs_col.find()
+        cursor = Connection.get_cursor()
+        cursor.execute("SELECT * FROM logs")
+        result = cursor.fetchall()
+
         data_array = []
-        for doc in result:
-            doc['_id'] = str(doc['_id'])
-            data_array.append(doc)
-        return data_array
+        for row in result:
+            log_entry = {
+                '_id': str(row[0]),
+                'timestamp': row[1],
+                'message': row[2]
+            }
+            data_array.append(log_entry)
+
+        sorted_data = sort_by_time(data_array)
+        return sorted_data
+
     except Exception as e:
-        print(f"Ошибка получения логов: {e}")
+        print(f"Error while getting logs: {e}")
         return []
 
 def serialize_datetime(obj):
