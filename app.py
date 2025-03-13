@@ -126,7 +126,7 @@ def start_scrapper_thread():
 
 @socketio.on('connect')
 def on_connect():
-    print("Клиент подключился, запускаем поток передачи данных.")
+    print("Client connected")
     start_data_thread()
 
 def run_flask_and_socketio():
