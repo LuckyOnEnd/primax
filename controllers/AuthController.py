@@ -9,7 +9,7 @@ from database.connection import Connection
 from services.bot import run_scrapper
 from socker_manager import start_local_socket_thread
 from validators.auth.authSchema import AuthSchema
-
+import urllib.parse
 
 class AuthController:
     @classmethod
@@ -23,9 +23,10 @@ class AuthController:
 
             try:
                 validate_data = AuthSchema().load(data)
+                password_encoded = urllib.parse.quote(data["password"])
                 response = requests.post(
                     f'https://api.primexalgo.com/auth?username='
-                    f'{data["user_id"]}&password={data["password"]}'
+                    f'{data["user_id"]}&password={password_encoded}'
                 )
                 response.raise_for_status()
                 token = response.json()
@@ -133,6 +134,7 @@ class AuthController:
                 ), 400
 
         except Exception as e:
+            print('Error while authorizing')
             return jsonify(
                 {
                     'message': 'Internal server error',
