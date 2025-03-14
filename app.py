@@ -83,7 +83,7 @@ def fetch_logs():
                 'Price': row[1],
                 'Signal': row[4],
                 'Quantity': row[5],
-                'Type': row[0],
+                'order_type': row[0],
                 'Time': row[3],
                 'PositionOpened': row[6],
                 'commission': row[7],

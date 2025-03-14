@@ -28,7 +28,6 @@ class ReportController:
                 validate_data = ReportSchema().load(data)
 
                 cursor = Connection.get_cursor()
-                # Предполагаем, что PositionOpened хранится в формате DATETIME (YYYY-MM-DD HH:MM:SS)
                 query = """
                     SELECT Price, commission, realized_pnl 
                     FROM logs 
@@ -46,9 +45,8 @@ class ReportController:
                 net_profit = 0
 
                 for order in result:
-                    # Структура результата: (Price, commission, realized_pnl)
-                    realized_pnl = float(order[2] or 0)  # realized_pnl
-                    commission = float(order[1] or 0)    # commission
+                    realized_pnl = float(order[2] or 0)
+                    commission = float(order[1] or 0)
 
                     if realized_pnl < 0:
                         total_loss += abs(realized_pnl)

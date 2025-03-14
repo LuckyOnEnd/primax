@@ -15,6 +15,7 @@ class AuthController:
     @classmethod
     def auth(cls):
         try:
+            print('Authorize ...')
             if request.method != 'POST':
                 return jsonify({'message': 'Such method not allowed', 'success': False}), 405
 
@@ -112,6 +113,7 @@ class AuthController:
                         keys_data[3] if keys_data else None,
                     )
 
+                print('Authorized')
                 return jsonify(
                     {
                         'message': 'Authenticated successfully',
