@@ -1,3 +1,4 @@
+import shutil
 import sqlite3
 from werkzeug.security import generate_password_hash
 import os
@@ -8,18 +9,42 @@ import os
 import sys
 
 def get_db_path():
-    if getattr(sys, "frozen", False):
+    if sys.platform == "win32":
+        target_base_dir = os.path.join(os.environ.get("ProgramFiles", "C:\\Program Files"), "Primex")
+    else:
+        target_base_dir = os.path.join("/usr/local", "primex")
+
+    target_db_dir = os.path.join(target_base_dir, "database")
+    target_db_path = os.path.join(target_db_dir, "tradeview.db")
+
+    if getattr(sys, "frozen", False):  # Nuitka
         current_dir = os.path.dirname(sys.executable)
     else:
         current_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-    db_path = os.path.join(current_dir, "database", "tradeview.db")
+    source_db_path = os.path.join(current_dir, "database", "tradeview.db")
 
-    os.makedirs(os.path.dirname(db_path), exist_ok=True)
+    if os.path.exists(source_db_path) and not os.path.exists(target_db_path):
+        try:
+            os.makedirs(target_db_dir, exist_ok=True)
+            shutil.copy2(source_db_path, target_db_path)
+            print(f"Copied database from {source_db_path} to {target_db_path}")
+        except PermissionError:
+            print(f"Permission denied to copy database to {target_db_path}. Using source path.")
+            return source_db_path
+        except Exception as e:
+            print(f"Error copying database: {e}")
+            return source_db_path
 
-    return db_path
+    if not os.path.exists(target_db_dir):
+        try:
+            os.makedirs(target_db_dir, exist_ok=True)
+        except PermissionError:
+            print(f"Permission denied to create {target_db_dir}. Using source path.")
+            return source_db_path
 
-
+    print(f"Database path: {target_db_path}")
+    return target_db_path
 
 class Connection:
     _conn = None
