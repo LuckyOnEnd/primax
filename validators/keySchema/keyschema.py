@@ -14,7 +14,7 @@ class keySchema(Schema):
         validate=lambda x: len(x) > 0,
         error_messages={"required": "API secret is required."},
     )
-    type = fields.String(required=True, error_messages={"required": "Type is invalid."})
+    order_type = fields.String(required=True, error_messages={"required": "Type is invalid."})
     signal_type = fields.String()
 
     amount = fields.Float(
@@ -32,7 +32,7 @@ class keySchema(Schema):
     trading_view_chart_link = fields.String(
     )
 
-    @validates('type')
+    @validates('order_type')
     def validate_type(self, key):
         if key not in ['spot', 'future']:
             raise ValidationError('Type is invalid. Must be Spot or Futures.')
