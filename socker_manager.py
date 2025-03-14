@@ -26,13 +26,17 @@ def connect_to_websocket_server(email, password, binance_key, binance_secret, ty
         try:
             ws = websocket.WebSocket()
             ws.connect(uri)
+            ws.settimeout(1)
 
             credentials_message = f"email={email}&password={password}"
             ws.send(credentials_message)
 
             while not stop_event.is_set():
-                message = ws.recv()
-                if not message:
+                try:
+                    message = ws.recv()
+                    if not message:
+                        continue
+                except websocket.WebSocketTimeoutException:
                     continue
 
                 try:
