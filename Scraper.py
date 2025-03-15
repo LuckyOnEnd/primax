@@ -294,7 +294,7 @@ class TradingView:
                                 'Signal': signal,
                                 'Quantity': float(quantity),
                                 'PositionOpened': datetime.now(),
-                                'email': self.email,
+                                'Email': self.email,
                             }
 
                             if data['Price'] and data['Signal'] and data['Symbol']:
