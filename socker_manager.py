@@ -61,6 +61,7 @@ def connect_to_websocket_server(email, password, binance_key, binance_secret, ty
                         coin_price = binance_api.get_future_price(data['Symbol'])
                         data['Price'] = coin_price
                         data['order_type'] = type
+                        data['email'] = email
                         if type == 'future':
                             binance_api.create_order_future(data)
                         else:
