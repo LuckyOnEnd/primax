@@ -112,7 +112,7 @@ def send_periodic_data(sid, email):
         data_array = fetch_logs(email)
         if data_array:
             serialized_data = json.loads(json.dumps(data_array, default=serialize_datetime))
-            emit('data', {'message': 'Data retrieved', 'data': serialized_data}, to=sid)
+            socketio.emit('data', {'message': 'Data retrieved', 'data': serialized_data}, to=sid)
         time.sleep(1)
 
 def start_data_thread(sid, email):
@@ -142,11 +142,11 @@ def on_connect():
         data_array = fetch_logs(email)
         if data_array:
             serialized_data = json.loads(json.dumps(data_array, default=serialize_datetime))
-            emit('data', {'message': 'Initial data', 'data': serialized_data})
+            socketio.emit('data', {'message': 'Initial data', 'data': serialized_data})
         start_data_thread(request.sid, email)
     else:
         print("Client connected without email")
-        emit('error', {'message': 'Email is required'})
+        socketio.emit('error', {'message': 'Email is required'})
 
 
 @socketio.on('join')
@@ -159,7 +159,7 @@ def on_join(data):
 
         start_data_thread(sid, email)
     else:
-        emit('error', {'message': 'Email is required'}, to=request.sid)
+        socketio.emit('error', {'message': 'Email is required'}, to=request.sid)
 
 def run_flask_and_socketio():
     socketio.run(app, host="0.0.0.0", port=8000)
