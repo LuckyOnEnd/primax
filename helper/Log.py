@@ -15,7 +15,7 @@ def insertlog(data):
             INSERT INTO logs (
                 order_type, Price, Symbol, Time, Signal, Quantity, 
                 PositionOpened, commission, realized_pnl, Email
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """
         values = (
             data.get('order_type'),
