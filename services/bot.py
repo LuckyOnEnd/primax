@@ -6,14 +6,14 @@ bot_thread: threading.Thread | None = None
 stop_event = threading.Event()
 bot: TradingView | None = None
 
-def run_scrapper(login_id, password, chart_link):
+def run_scrapper(login_id, password, chart_link, email):
     global bot_thread, bot
     print('event stop')
     stop_event.clear()
     print('create thread')
     bot_thread = threading.Thread(
         target=Bot, args=(Config.Captcha_API, login_id,
-                          password, chart_link)
+                          password, chart_link, email)
     )
     print('start thread')
     bot_thread.start()
@@ -32,9 +32,9 @@ def stop_scrapper():
         bot = None
 
 
-def Bot(Captcha_API, Username, password, chart_link):
+def Bot(Captcha_API, Username, password, chart_link, email):
     global bot
-    bot = TradingView(Captcha_API, Username, password, stop_event, chart_link)
+    bot = TradingView(Captcha_API, Username, password, stop_event, chart_link, email)
     count = 0
     for x in range(0, 10):
         try:

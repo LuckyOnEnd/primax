@@ -14,7 +14,7 @@ def insertlog(data):
         query = """
             INSERT INTO logs (
                 order_type, Price, Symbol, Time, Signal, Quantity, 
-                PositionOpened, commission, realized_pnl
+                PositionOpened, commission, realized_pnl, Email
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """
         values = (
@@ -26,7 +26,8 @@ def insertlog(data):
             data.get('Quantity'),
             data.get('PositionOpened'),
             data.get('commission'),
-            data.get('realized_pnl')
+            data.get('realized_pnl'),
+            data.get('Email')
         )
 
         cursor.execute(query, values)

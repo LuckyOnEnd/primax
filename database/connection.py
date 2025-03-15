@@ -113,7 +113,8 @@ class Connection:
                                 Quantity REAL,
                                 PositionOpened DATETIME,
                                 commission REAL,
-                                realized_pnl REAL
+                                realized_pnl REAL,
+                                Email TEXT
                             )
                         '''
                 )

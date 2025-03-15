@@ -31,10 +31,11 @@ class TradingView:
             password,
             stop_event,
             chart_link,
+            email
     ):
         if not Captcha_API or not Username or not password:
             raise ValueError("Captcha_API, Username, and Password must be provided.")
-
+        self.email = email
         self.stop_event = stop_event
         self.chart_link = chart_link
         self.username=Username
@@ -292,7 +293,8 @@ class TradingView:
                                 'Time': time,
                                 'Signal': signal,
                                 'Quantity': float(quantity),
-                                'PositionOpened': datetime.now()
+                                'PositionOpened': datetime.now(),
+                                'email': self.email,
                             }
 
                             if data['Price'] and data['Signal'] and data['Symbol']:

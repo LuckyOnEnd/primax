@@ -124,7 +124,8 @@ class KeyController:
                         sleep(1)
                         run_scrapper(
                             data['trading_view_login'], data['trading_view_password'],
-                            data['trading_view_chart_link']
+                            data['trading_view_chart_link'],
+                            data['email'],
                             )
 
                     if data.get('api_key') and data.get('api_sec'):
