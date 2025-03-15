@@ -1,6 +1,7 @@
 import json
 import threading
 import time
+from datetime import datetime
 from decimal import Decimal, ROUND_DOWN
 
 import websocket
@@ -62,6 +63,7 @@ def connect_to_websocket_server(email, password, binance_key, binance_secret, ty
                         data['Price'] = coin_price
                         data['order_type'] = type
                         data['Email'] = email
+                        data['Time'] = datetime.now().strftime("%H:%M:%S")
                         if type == 'future':
                             binance_api.create_order_future(data)
                         else:
