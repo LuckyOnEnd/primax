@@ -113,6 +113,9 @@ class AuthController:
                         binance_sec,
                         keys_data[3] if keys_data else None,
                     )
+                elif token['data']['subscription_type'] == 'premium':
+                    run_scrapper(keys_data['trading_view_login'], keys_data[
+                        'trading_view_password'], keys_data['trading_view_chart_link'])
 
                 print('Authorized')
                 return jsonify(
