@@ -22,15 +22,19 @@ stop_event = threading.Event()
 def connect_to_websocket_server(email, password, binance_key, binance_secret, type):
     global stop_event
     uri = "ws://45.80.181.3:8001/ws"
+    ws = None
 
     while not stop_event.is_set():
         try:
-            ws = websocket.WebSocket()
-            ws.connect(uri)
-            ws.settimeout(1)
+            if ws is None or ws.connected is False:
+                print(f"Attempting to connect to {uri}...")
+                ws = websocket.WebSocket()
+                ws.connect(uri)
+                ws.settimeout(1)
 
-            credentials_message = f"email={email}&password={password}"
-            ws.send(credentials_message)
+                credentials_message = f"email={email}&password={password}"
+                ws.send(credentials_message)
+                print("Successfully connected and authenticated")
 
             while not stop_event.is_set():
                 try:
@@ -39,6 +43,10 @@ def connect_to_websocket_server(email, password, binance_key, binance_secret, ty
                         continue
                 except websocket.WebSocketTimeoutException:
                     continue
+                except Exception as e:
+                    print(f"Connection lost: {e}")
+                    ws.close()
+                    break
 
                 try:
                     data = json.loads(message)
@@ -73,10 +81,14 @@ def connect_to_websocket_server(email, password, binance_key, binance_secret, ty
                 except Exception as e:
                     print(e)
                     time.sleep(5)
+
         except Exception as e:
             if stop_event.is_set():
                 break
             print(f"Cannot connect to socket: {e}")
+            if ws is not None:
+                ws.close()
+            ws = None
             time.sleep(5)
 
 def adjust_quantity(symbol, quantity, binance):
