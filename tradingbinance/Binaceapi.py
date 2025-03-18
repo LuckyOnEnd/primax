@@ -1,5 +1,6 @@
 import sys
 import os
+import time
 from datetime import datetime
 from time import sleep
 
@@ -154,8 +155,15 @@ class BinanceApi:
                     print(f'{datetime.utcnow()} Exception in future create order sell ', e)
 
             if len(position) < 1:
-                print(f'Open positions not found {datetime.utcnow()}')
-                return
+                for x in range(0, 10):
+                    position = self.client.futures_position_information(symbol=symbol)
+                    if len(position) > 0:
+                        break
+                    time.sleep(1)
+
+                if len(position) < 1:
+                    print(f'Open positions not found {datetime.utcnow()}')
+                    return
 
             if 'btp' in signal:
                 try:

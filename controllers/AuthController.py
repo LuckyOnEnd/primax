@@ -137,7 +137,7 @@ class AuthController:
                 ), 400
 
         except Exception as e:
-            print('Error while authorizing')
+            print(f'Error while authorizing:{e}')
             return jsonify(
                 {
                     'message': 'Internal server error',
