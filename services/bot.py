@@ -36,13 +36,13 @@ def Bot(Captcha_API, Username, password, chart_link, email):
     global bot
     bot = TradingView(Captcha_API, Username, password, stop_event, chart_link, email)
     count = 0
-    for x in range(0, 10):
-        try:
-            bot.Login()
-            break
-        except Exception as e:
-            count += 1
-            print(f'{e}\nTry again: {count}')
+    #for x in range(0, 10):
+    try:
+        bot.Login()
+        #break
+    except Exception as e:
+        count += 1
+        print(f'{e}\nTry again: {count}')
 
     if count == 10:
         stop_scrapper()
