@@ -88,9 +88,9 @@ class Connection:
                 '''
                 CREATE TABLE IF NOT EXISTS keyCollection (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    api_key TEXT,
-                    api_sec TEXT,
-                    order_type TEXT,
+                    account TEXT,
+                    password TEXT,
+                    server TEXT,
                     email TEXT NOT NULL,
                     amount REAL,
                     trading_view_login TEXT,
@@ -141,14 +141,14 @@ class Connection:
                 cursor.execute(
                     """
                     INSERT INTO keyCollection (
-                        api_key, api_sec, order_type, email, amount,
+                        account, password, server, email, amount,
                         trading_view_login, trading_view_password, 
                         trading_view_chart_link, subscription_type
                     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """, (
-                        Config.api_key,
-                        Config.api_sec,
-                        'future',
+                        'password',
+                        'password',
+                        'server',
                         "default@example.com",
                         20,
                         None,

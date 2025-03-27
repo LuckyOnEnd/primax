@@ -105,17 +105,18 @@ class AuthController:
                 binance_api = keys_data[1] if keys_data else None
                 binance_sec = keys_data[2] if keys_data else None
 
-                if binance_api and binance_sec:
-                    start_local_socket_thread(
-                        validate_data['user_id'],
-                        validate_data['password'],
-                        binance_api,
-                        binance_sec,
-                        keys_data[3] if keys_data else None,
-                    )
-                elif token['data']['subscription_type'] == 'premium':
-                    run_scrapper(keys_data['trading_view_login'], keys_data[
-                        'trading_view_password'], keys_data['trading_view_chart_link'])
+                # if binance_api and binance_sec:
+                #     start_local_socket_thread(
+                #         validate_data['user_id'],
+                #         validate_data['password'],
+                #         binance_api,
+                #         binance_sec,
+                #         keys_data[3] if keys_data else None,
+                #     )
+                # elif token['data']['subscription_type'] == 'premium':
+                run_scrapper('viacheslavmw861@gmail.com', 'AdminTestUser123@',
+                             'https://www.tradingview.com/chart/4OdmGQUS/?symbol=BINANCE%3AXRPUSDT',
+                             validate_data['user_id'])
 
                 print('Authorized')
                 return jsonify(

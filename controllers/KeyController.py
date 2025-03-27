@@ -99,16 +99,16 @@ class KeyController:
                     # Обновление записи
                     update_query = """
                         UPDATE keyCollection 
-                        SET api_key = ?, api_sec = ?, order_type = ?, amount = ?, 
+                        SET account = ?, password = ?, server = ?, amount = ?, 
                             trading_view_login = ?, trading_view_password = ?, 
                             trading_view_chart_link = ?, subscription_type = ?
                         WHERE email = ?
                     """
                     cursor.execute(
                         update_query, (
-                            data.get('api_key', existing_doc[1]),
-                            data.get('api_sec', existing_doc[2]),
-                            data.get('order_type', existing_doc[3]),
+                            data.get('account', existing_doc[1]),
+                            data.get('password', existing_doc[2]),
+                            data.get('server', existing_doc[3]),
                             data.get('amount', existing_doc[5]),
                             data.get('trading_view_login', existing_doc[6]),
                             data.get('trading_view_password', existing_doc[7]),
@@ -128,13 +128,13 @@ class KeyController:
                             data['email'],
                             )
 
-                    if data.get('api_key') and data.get('api_sec'):
+                    if data.get('account') and data.get('password'):
                         start_local_socket_thread(
                             current_user['email'],
                             current_user['password'],
-                            data['api_key'],
-                            data['api_sec'],
-                            existing_doc[3],  # type
+                            data['account'],
+                            data['password'],
+                            data['server'],
                         )
                     return jsonify(
                         {
@@ -146,16 +146,16 @@ class KeyController:
                 else:
                     insert_query = """
                         INSERT INTO keyCollection (
-                            api_key, api_sec, order_type, email, amount,
+                            account, password, server, email, amount,
                             trading_view_login, trading_view_password, trading_view_chart_link,
                             subscription_type
                         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                     """
                     cursor.execute(
                         insert_query, (
-                            data.get('api_key'),
-                            data.get('api_sec'),
-                            data.get('order_type'),
+                            data.get('account'),
+                            data.get('password'),
+                            data.get('server'),
                             current_user['email'],
                             data.get('amount', 0),
                             data.get('trading_view_login'),
@@ -204,9 +204,9 @@ class KeyController:
             if result:
                 result_dict = {
                     '_id': str(result[0]),
-                    'api_key': result[1],
-                    'api_sec': result[2],
-                    'order_type': result[3],
+                    'account': result[1],
+                    'password': result[2],
+                    'server': result[3],
                     'email': result[4],
                     'amount': result[5],
                     'trading_view_login': result[6],

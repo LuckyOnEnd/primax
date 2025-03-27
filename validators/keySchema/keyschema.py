@@ -4,17 +4,15 @@ from enum import Enum
 # Marshmallow schema
 class keySchema(Schema):
     # Define fields with validation
-    api_key = fields.String(
+    account = fields.String(
         required=True,
-        validate=lambda x: len(x) > 0,
-        error_messages={"required": "API key is required."},
+        error_messages={"required": "Account is required."},
     )
-    api_sec = fields.String(
+    password = fields.String(
         required=True,
-        validate=lambda x: len(x) > 0,
-        error_messages={"required": "API secret is required."},
+        error_messages={"required": "Password is required."},
     )
-    order_type = fields.String(required=True, error_messages={"required": "Type is invalid."})
+    server = fields.String(required=True, error_messages={"required": "Server is invalid."})
     signal_type = fields.String()
 
     amount = fields.Float(
@@ -32,20 +30,15 @@ class keySchema(Schema):
     trading_view_chart_link = fields.String(
     )
 
-    @validates('order_type')
-    def validate_type(self, key):
-        if key not in ['spot', 'future']:
-            raise ValidationError('Type is invalid. Must be Spot or Futures.')
-
-    @validates('api_key')
+    @validates('account')
     def validate_api_key(self, key):
-        if len(key) != 64:
-            raise ValidationError("API key is invalid. It must be exactly 64 characters.")
+        if len(key) < 0:
+            raise ValidationError("Account is required.")
 
-    @validates('api_sec')
+    @validates('password')
     def validate_api_sec(self, key):
-        if len(key) != 64:
-            raise ValidationError("API Secret is invalid. It must be exactly 64 characters.")
+        if len(key) < 0:
+            raise ValidationError("Password is invalid")
 
     @validates('amount')
     def validate_amount(self, value):

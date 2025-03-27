@@ -2,6 +2,7 @@ import jwt
 from functools import wraps
 from flask import request, jsonify
 from database.connection import Connection
+from socker_manager import socket_thread
 
 SECRET_KEY = "your_secret_key"
 
@@ -21,6 +22,9 @@ def token_required(f):
             cursor = Connection.get_cursor()
             cursor.execute("SELECT * FROM users WHERE email = ?", (data["user_id"],))
             current_user = cursor.fetchone()
+
+            if socket_thread is not None and socket_thread.is_alive():
+                pass
 
             if not current_user:
                 return jsonify({'message': 'User not found', 'success': False}), 401
