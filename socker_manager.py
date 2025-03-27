@@ -11,6 +11,7 @@ from flask_socketio import SocketIO
 
 from database.connection import Connection
 from tradingbinance.Binaceapi import BinanceApi
+from tradingbinance.mt5 import MT5
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
@@ -19,7 +20,7 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 socket_thread: threading.Thread = None
 stop_event = threading.Event()
 
-def connect_to_websocket_server(email, password, binance_key, binance_secret, type):
+def connect_to_websocket_server(email, password, account, mt_password, server):
     global stop_event
     uri = "ws://45.80.181.3:8001/ws"
     ws = None
@@ -59,23 +60,16 @@ def connect_to_websocket_server(email, password, binance_key, binance_secret, ty
                             print(f"No key found for email: {email}")
                             continue
 
-                        binance_api = BinanceApi(api_key=binance_key, api_secret=binance_secret)
-                        coin_price = binance_api.get_future_price(data['Symbol'])
-
-                        amount = col[5]
-                        amount = int(amount) / float(coin_price)
-
-                        quantity = adjust_quantity(data['Symbol'], amount, binance_api)
-                        data['Quantity'] = float(quantity)
-                        coin_price = binance_api.get_future_price(data['Symbol'])
-                        data['Price'] = coin_price
+                        mt_api = MT5(account=int(account), password=mt_password, server=server)
+                        data['Quantity'] = float(0.01)
+                        data['Price'] = 'coin_price'
                         data['order_type'] = type
                         data['Email'] = email
                         data['Time'] = datetime.now().strftime("%H:%M:%S")
-                        if type == 'future':
-                            binance_api.create_order_future(data)
+                        if data['Signal'] == 'Buy' or data['Signal'] == 'Sell':
+                            mt_api.open_trade(data)
                         else:
-                            binance_api.create_order_spot(data)
+                            mt_api.close_trade(data)
                 except json.JSONDecodeError:
                     print(f"📩 error {message}")
                 except Exception as e:
@@ -101,7 +95,7 @@ def adjust_quantity(symbol, quantity, binance):
             )
     return quantity
 
-def start_local_socket_thread(email, password, binance_key, binance_secret, type):
+def start_local_socket_thread(email, password, account, mt_password, server):
     global socket_thread, stop_event
 
     if socket_thread is not None and socket_thread.is_alive():
@@ -110,6 +104,6 @@ def start_local_socket_thread(email, password, binance_key, binance_secret, type
 
     stop_event.clear()
 
-    socket_thread = threading.Thread(target=connect_to_websocket_server, args=(email, password, binance_key, binance_secret, type))
+    socket_thread = threading.Thread(target=connect_to_websocket_server, args=(email, password, account, mt_password, server))
     socket_thread.daemon = True
     socket_thread.start()

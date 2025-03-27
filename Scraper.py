@@ -19,6 +19,8 @@ from time import sleep
 import random
 
 from tradingbinance.Binaceapi import BinanceApi
+from tradingbinance.mt5 import MT5
+
 
 class CredentialException(Exception):
     pass
@@ -270,39 +272,36 @@ class TradingView:
 
                             last_signal = signal
 
-                            cursor.execute("SELECT * FROM users WHERE email = ?", (self.username,))
+                            cursor.execute("SELECT * FROM keyCollection WHERE email = ?", (self.email,))
                             result = cursor.fetchone()
                             if result is None:
                                 continue
 
-                            binance = BinanceApi(result[1], result[2])
+                            mt5 = MT5(int(result[1]), result[2], result[3])
 
-                            symbol = None
+                            symbol = symbol_value
                             if symbol_value.__contains__(".P"):
                                 symbol = symbol_value.split(".P")[0]
-                            coin_price = binance.get_future_price(symbol)
 
                             amount = result[5]
-                            amount = int(amount) / float(coin_price)
 
-                            quantity = self.adjust_quantity(symbol, amount, binance)
                             data = {
-                                'type': result[3],#todo
-                                'Price': coin_price,
+                                'type': 'future',#todo
+                                'Price': 1,
                                 'Symbol': symbol,
                                 'Time': time,
                                 'Signal': signal,
-                                'Quantity': float(quantity),
+                                'Quantity': float(0.01),
                                 'PositionOpened': datetime.now(),
                                 'Email': self.email,
                             }
 
                             if data['Price'] and data['Signal'] and data['Symbol']:
                                 try:
-                                    if data.get('type') == 'spot':
-                                         binance.create_order_spot(data)
+                                    if data.get('Signal') == 'Buy' or data.get('Signal') == 'Sell':
+                                        mt5.open_trade(data)
                                     else:
-                                        binance.create_order_future(data)
+                                        mt5.close_trade(data)
 
                                     try:
                                         get_alert.click()
