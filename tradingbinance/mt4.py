@@ -7,7 +7,7 @@ class MT4:
     def __init__(self):
         context = zmq.Context()
         self.socket = context.socket(zmq.REQ)
-        self.socket.connect("tcp://localhost:5555")
+        self.socket.connect("tcp://localhost:5566")
 
     def open_trade(self, data):
         symbol = data['Symbol']
