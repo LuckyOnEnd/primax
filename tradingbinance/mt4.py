@@ -15,8 +15,8 @@ class MT4:
         if 'USDT' in symbol:
             symbol = re.sub(r'USDT.*', 'USD.a', symbol)
 
-        # if not symbol.endswith('.e'):
-        #     symbol += '.e'
+        if not symbol.endswith('+'):
+            symbol += '+'
 
         amount = data['Quantity']
         self.socket.send_string(f"{"SELL" if data["Signal"] == "Sell" else "BUY"} {symbol} {0.01}")
@@ -27,8 +27,8 @@ class MT4:
         if 'USDT' in symbol:
             symbol = re.sub(r'USDT.*', 'USD.a', symbol)
 
-        # if not symbol.endswith('.e'):
-        #     symbol += '.e'
+        if not symbol.endswith('+'):
+            symbol += '+'
 
         self.socket.send_string(f"{"CLOSE"} {symbol}")
 
