@@ -11,6 +11,7 @@ from flask_socketio import SocketIO
 
 from database.connection import Connection
 from tradingbinance.Binaceapi import BinanceApi
+from tradingbinance.mt4 import MT4
 from tradingbinance.mt5 import MT5
 
 app = Flask(__name__)
@@ -60,7 +61,7 @@ def connect_to_websocket_server(email, password, account, mt_password, server):
                             print(f"No key found for email: {email}")
                             continue
 
-                        mt_api = MT5(account=int(account), password=mt_password, server=server)
+                        mt_api = MT4()
                         data['Quantity'] = float(0.01)
                         data['Price'] = 'coin_price'
                         data['order_type'] = type

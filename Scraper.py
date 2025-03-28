@@ -19,6 +19,7 @@ from time import sleep
 import random
 
 from tradingbinance.Binaceapi import BinanceApi
+from tradingbinance.mt4 import MT4
 from tradingbinance.mt5 import MT5
 
 
@@ -277,7 +278,7 @@ class TradingView:
                             if result is None:
                                 continue
 
-                            mt5 = MT5(int(result[1]), result[2], result[3])
+                            mt5 = MT4()
 
                             symbol = symbol_value
                             if symbol_value.__contains__(".P"):
