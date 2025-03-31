@@ -11,6 +11,7 @@ from socker_manager import start_local_socket_thread
 from validators.auth.authSchema import AuthSchema
 import urllib.parse
 
+from socker_manager import start_public_socket_thread
 class AuthController:
     @classmethod
     def auth(cls):
