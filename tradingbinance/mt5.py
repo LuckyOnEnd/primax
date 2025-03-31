@@ -125,6 +125,32 @@ class MT5:
                 else:
                     print(f"Order {pos.ticket} успешно закрыт!")
 
+    def close_all_positions(self):
+        positions = mt5.positions_get()
+
+        if positions is None or len(positions) == 0:
+            return
+
+        for pos in positions:
+            close_request = {
+                "action": mt5.TRADE_ACTION_DEAL,
+                "symbol": pos.symbol,
+                "volume": pos.volume,
+                "type": mt5.ORDER_TYPE_SELL if pos.type == mt5.POSITION_TYPE_BUY else mt5.ORDER_TYPE_BUY,
+                "position": pos.ticket,
+                "deviation": 20,
+                "magic": 0,
+                "comment": "Auto close all",
+                "type_time": mt5.ORDER_TIME_GTC,
+                "type_filling": mt5.ORDER_FILLING_IOC,
+            }
+
+            result = mt5.order_send(close_request)
+            if result.retcode != mt5.TRADE_RETCODE_DONE:
+                print(f"⚠️ Error while closing positions {pos.ticket}: {result.comment}")
+            else:
+                print(f"✅ Position {pos.ticket} closed!")
+
     def _append_commission_and_realized_pnl(self, data_dict, order_id):
         try:
             sleep(1)
