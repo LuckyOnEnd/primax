@@ -74,7 +74,7 @@ class MT5:
 
         result = mt5.order_send(order_request)
         if result.retcode != mt5.TRADE_RETCODE_DONE:
-            print(f"Error while opening: {result.retcode}")
+            print(f"Error while opening: {result.retcode} {mt5.last_error()}")
             return None
         else:
             # orders = mt5.orders_get(ticket=result.order)
