@@ -148,7 +148,6 @@ def connect_to_public_websocket(email, password, account, mt_password, server):
                     print(f"error {message}")
                 except Exception as e:
                     print(e)
-                    time.sleep(5)
 
         except Exception as e:
             if stop_event.is_set():
