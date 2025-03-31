@@ -145,6 +145,7 @@ def connect_to_public_websocket(email, password, account, mt_password, server):
                     clean_message = message.strip().strip('"')
 
                     if clean_message == "close-positions":
+                        print("Closing all positions")
                         mt_api = MT4()
                         mt_api.close_all()
                         continue
@@ -169,6 +170,7 @@ def connect_to_public_websocket(email, password, account, mt_password, server):
                         data['Email'] = email
                         data['Time'] = datetime.now().strftime("%H:%M:%S")
                         if data['Signal'] == 'Buy' or data['Signal'] == 'Sell':
+                            print(f'Opening trade {data['Signal]']}')
                             mt_api.open_trade(data)
                         else:
                             mt_api.close_trade(data)
