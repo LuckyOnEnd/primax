@@ -32,6 +32,9 @@ class MT4:
 
         self.socket.send_string(f"{"CLOSE"} {symbol}")
 
+    def close_all(self):
+        self.socket.send_string(f"{"CLOSE_ALL"}")
+
     def _append_commission_and_realized_pnl(self, data_dict, order_id):
         try:
             sleep(1)
