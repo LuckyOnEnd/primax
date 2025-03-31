@@ -23,6 +23,7 @@ class MT5:
         if not symbol.endswith('.e'):
             symbol += '.e'
 
+        symbol = 'XRPUSD.a'
         symbol_info = mt5.symbol_info(symbol)
         if symbol_info is None:
             print(f"Error: Symbol {symbol} unavailable f{datetime.utcnow()}")
