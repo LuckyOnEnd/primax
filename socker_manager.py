@@ -164,6 +164,7 @@ def connect_to_public_websocket(email, password, account, mt_password, server):
                             print(f"No key found for email: {email}")
                             continue
 
+                        print('MT4 Signal open start')
                         mt_api = MT4()
                         data['Quantity'] = float(0.01)
                         data['Price'] = 'coin_price'
