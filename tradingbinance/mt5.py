@@ -62,7 +62,7 @@ class MT5:
         order_request = {
             "action": mt5.TRADE_ACTION_DEAL,
             "symbol": symbol,
-            "volume": 0.1,
+            "volume": 0.01,
             "type": mt5.ORDER_TYPE_SELL if data["Signal"] == "Sell" else mt5.ORDER_TYPE_BUY,
             "price": price,
             "deviation": 1,
