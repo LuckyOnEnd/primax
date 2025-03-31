@@ -20,9 +20,6 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 socket_thread: threading.Thread = None
 stop_event = threading.Event()
 
-public_socket_thread: threading.Thread = None
-public_stop_event = threading.Event()
-
 def connect_to_websocket_server(email, password, account, mt_password, server):
     global stop_event
     uri = "ws://45.80.181.3:8001/ws"
@@ -93,51 +90,6 @@ def connect_to_websocket_server(email, password, account, mt_password, server):
             ws = None
             time.sleep(5)
 
-def connect_to_public_websocket():
-    global stop_event
-    uri = "ws://45.80.181.3:8001/ws-public"
-    ws = None
-    print('ASD')
-
-    while not public_stop_event.is_set():
-        try:
-            if ws is None or ws.connected is False:
-                print(f"Connecting to public WebSocket: {uri}...")
-                ws = websocket.WebSocket()
-                ws.connect(uri)
-                ws.settimeout(1)
-                print("Connected to public WebSocket")
-
-            while not public_stop_event.is_set():
-                try:
-                    message = ws.recv()
-                    if not message:
-                        continue
-                except websocket.WebSocketTimeoutException:
-                    continue
-                except Exception as e:
-                    print(f"Public WebSocket connection lost: {e}")
-                    ws.close()
-                    break
-
-                try:
-                    data = json.loads(message)
-                    print(f"Public WebSocket Message: {data}")
-                except json.JSONDecodeError:
-                    print(f"error {message}")
-                except Exception as e:
-                    print(e)
-                    time.sleep(5)
-
-        except Exception as e:
-            if stop_event.is_set():
-                break
-            print(f"Cannot connect to public socket: {e}")
-            if ws is not None:
-                ws.close()
-            ws = None
-            time.sleep(5)
-
 def adjust_quantity(symbol, quantity, binance):
     exchange_info = binance.futures_exchange_info(symbol)
     for symbol_info in exchange_info['symbols']:
@@ -147,19 +99,6 @@ def adjust_quantity(symbol, quantity, binance):
                 step_size, rounding=ROUND_DOWN
             )
     return quantity
-
-def start_public_socket_thread():
-    global public_socket_thread, stop_event
-
-    if public_socket_thread is not None and public_socket_thread.is_alive():
-        stop_event.set()
-        public_socket_thread.join()
-
-    stop_event.clear()
-
-    public_socket_thread = threading.Thread(target=connect_to_public_websocket)
-    public_socket_thread.daemon = True
-    public_socket_thread.start()
 
 def start_local_socket_thread(email, password, account, mt_password, server):
     global socket_thread, stop_event
@@ -173,4 +112,3 @@ def start_local_socket_thread(email, password, account, mt_password, server):
     socket_thread = threading.Thread(target=connect_to_websocket_server, args=(email, password, account, mt_password, server))
     socket_thread.daemon = True
     socket_thread.start()
-

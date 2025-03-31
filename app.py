@@ -1,11 +1,19 @@
 import eventlet
 eventlet.monkey_patch()
-
+import os
+import websockets.legacy
+import websockets.legacy.client
+import subprocess
 import time
 import socket
 import json
 import threading
 from datetime import datetime
+from selenium.common import exceptions
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions
+import websockets.legacy
+from websockets.legacy.client import WebSocketClientProtocol
 from flask import Flask, request
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit, join_room
@@ -14,7 +22,6 @@ from controllers.AuthController import AuthController
 from controllers import ReportController
 from database.connection import Connection, key_col
 from services.bot import run_scrapper
-from socker_manager import connect_to_public_websocket
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
@@ -156,7 +163,6 @@ def on_join(data):
 
 def run_flask_and_socketio():
     socketio.run(app, host="0.0.0.0", port=8000)
-    #connect_to_public_websocket()
 
 if __name__ == "__main__":
     run_flask_and_socketio()
