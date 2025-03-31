@@ -53,11 +53,6 @@ def connect_to_websocket_server(email, password, account, mt_password, server):
                     break
 
                 try:
-                    if message == "close-positions":
-                        mt_api = MT5(account=int(account), password=mt_password, server=server)
-                        mt_api.close_all_positions()
-                        return
-
                     data = json.loads(message)
                     if isinstance(data, dict) and 'Symbol' in data:
                         cursor = Connection.get_cursor()
@@ -121,8 +116,31 @@ def connect_to_public_websocket():
                     break
 
                 try:
+                    if message == "close-positions":
+                        mt_api = MT5(account=int(account), password=mt_password, server=server)
+                        mt_api.close_all_positions()
+                        return
+
                     data = json.loads(message)
-                    print(f"Public WebSocket Message: {data}")
+                    if isinstance(data, dict) and 'Symbol' in data:
+                        cursor = Connection.get_cursor()
+                        cursor.execute("SELECT * FROM keyCollection WHERE email = ?", (email,))
+                        col = cursor.fetchone()
+
+                        if not col:
+                            print(f"No key found for email: {email}")
+                            continue
+
+                        mt_api = MT5(account=int(account), password=mt_password, server=server)
+                        data['Quantity'] = float(0.01)
+                        data['Price'] = 'coin_price'
+                        data['order_type'] = type
+                        data['Email'] = email
+                        data['Time'] = datetime.now().strftime("%H:%M:%S")
+                        if data['Signal'] == 'Buy' or data['Signal'] == 'Sell':
+                            mt_api.open_trade(data)
+                        else:
+                            mt_api.close_trade(data)
                 except json.JSONDecodeError:
                     print(f"error {message}")
                 except Exception as e:
@@ -148,7 +166,7 @@ def adjust_quantity(symbol, quantity, binance):
             )
     return quantity
 
-def start_public_socket_thread():
+def start_public_socket_thread(email, password, account, mt_password, server):
     global public_socket_thread, stop_event
 
     if public_socket_thread is not None and public_socket_thread.is_alive():
@@ -157,7 +175,7 @@ def start_public_socket_thread():
 
     stop_event.clear()
 
-    public_socket_thread = threading.Thread(target=connect_to_public_websocket)
+    public_socket_thread = threading.Thread(target=connect_to_public_websocket, args=(email, password, account, mt_password, server))
     public_socket_thread.daemon = True
     public_socket_thread.start()
 

@@ -155,8 +155,8 @@ def on_join(data):
         socketio.emit('error', {'message': 'Email is required'}, to=request.sid)
 
 def run_flask_and_socketio():
+    connect_to_public_websocket()
     socketio.run(app, host="0.0.0.0", port=8000)
-    #connect_to_public_websocket()
 
-if __name__ == "__main__":
-    run_flask_and_socketio()
+
+run_flask_and_socketio()

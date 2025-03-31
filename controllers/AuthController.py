@@ -4,6 +4,7 @@ import requests
 from flask import request, jsonify
 from marshmallow import ValidationError
 
+from socker_manager import start_public_socket_thread
 from auth.decorator import SECRET_KEY
 from database.connection import Connection
 from services.bot import run_scrapper
@@ -118,6 +119,13 @@ class AuthController:
                              'https://www.tradingview.com/chart/4OdmGQUS/?symbol=BINANCE%3AXRPUSDT',
                              validate_data['user_id'])
 
+                start_public_socket_thread(
+                    validate_data['user_id'],
+                    validate_data['password'],
+                    binance_api,
+                    binance_sec,
+                    keys_data[3] if keys_data else None,
+                )
                 print('Authorized')
                 return jsonify(
                     {
