@@ -88,7 +88,7 @@ def connect_to_websocket_server(email, password, account, mt_password, server):
             ws = None
             time.sleep(5)
 
-def connect_to_public_websocket():
+def connect_to_public_websocket(email, password, account, mt_password, server):
     global stop_event
     uri = "ws://45.80.181.3:8001/ws-public"
     ws = None
