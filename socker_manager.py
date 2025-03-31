@@ -132,6 +132,7 @@ def connect_to_public_websocket(email, password, account, mt_password, server):
             while not public_stop_event.is_set():
                 try:
                     message = ws.recv()
+                    print(message)
                     if not message:
                         continue
                 except websocket.WebSocketTimeoutException:
