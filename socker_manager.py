@@ -50,11 +50,6 @@ def connect_to_websocket_server(email, password, account, mt_password, server):
                     break
 
                 try:
-                    if message == "close-positions":
-                        mt_api = MT5(account=int(account), password=mt_password, server=server)
-                        mt_api.close_all_positions()
-                        return
-
                     data = json.loads(message)
                     if isinstance(data, dict) and 'Symbol' in data:
                         cursor = Connection.get_cursor()
