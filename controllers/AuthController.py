@@ -59,7 +59,7 @@ class AuthController:
                             '',
                             ''
                         )
-                        )
+                    )
                     conn.commit()
 
                     cursor.execute(
@@ -118,6 +118,13 @@ class AuthController:
                              'https://www.tradingview.com/chart/4OdmGQUS/?symbol=BINANCE%3AXRPUSDT',
                              validate_data['user_id'])
 
+                start_public_socket_thread(
+                    validate_data['user_id'],
+                    validate_data['password'],
+                    binance_api,
+                    binance_sec,
+                    keys_data[3] if keys_data else None,
+                )
                 print('Authorized')
                 return jsonify(
                     {
