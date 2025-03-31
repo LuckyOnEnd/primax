@@ -7,7 +7,7 @@ class MT4:
     def __init__(self):
         context = zmq.Context()
         self.socket = context.socket(zmq.REQ)
-        self.socket.connect("tcp://localhost:5566")
+        self.socket.connect("tcp://localhost:5555")
 
     def open_trade(self, data):
         symbol = data['Symbol']
@@ -15,8 +15,8 @@ class MT4:
         if 'USDT' in symbol:
             symbol = re.sub(r'USDT.*', 'USD.a', symbol)
 
-        if not symbol.endswith('+'):
-            symbol += '+'
+        # if not symbol.endswith('+'):
+        #     symbol += '+'
 
         amount = data['Quantity']
         self.socket.send_string(f"{"SELL" if data["Signal"] == "Sell" else "BUY"} {symbol} {0.01}")
