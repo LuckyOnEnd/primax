@@ -121,7 +121,7 @@ def connect_to_public_websocket(email, password, account, mt_password, server):
                     if clean_message == "close-positions":
                         mt_api = MT5(account=int(account), password=mt_password, server=server)
                         mt_api.close_all_positions()
-                        return
+                        continue
 
                     data = json.loads(message)
                     if isinstance(data, dict) and 'Symbol' in data:
