@@ -8,6 +8,7 @@ bot: TradingView | None = None
 
 def run_scrapper(login_id, password, chart_link, email):
     global bot_thread, bot
+    stop_scrapper()
     print('event stop')
     stop_event.clear()
     print('create thread')

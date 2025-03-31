@@ -124,7 +124,10 @@ def connect_to_public_websocket(email, password, account, mt_password, server):
                     data = json.loads(message)
                     if isinstance(data, dict) and 'Symbol' in data:
                         cursor = Connection.get_cursor()
-                        cursor.execute("SELECT * FROM keyCollection WHERE email = ?", (email,))
+                        cursor.execute(
+                            "SELECT * FROM keyCollection WHERE email = ?",
+                            (email,)
+                        )
                         col = cursor.fetchone()
 
                         if not col:

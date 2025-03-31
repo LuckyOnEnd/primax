@@ -49,13 +49,12 @@ class AuthController:
                     cursor.execute(
                         """
                         INSERT INTO keyCollection (
-                            email, subscription_type, order_type, 
+                            email, subscription_type, 
                             trading_view_chart_link, trading_view_login, trading_view_password
-                        ) VALUES (?, ?, ?, ?, ?, ?)
+                        ) VALUES (?, ?, ?, ?, ?)
                     """, (
                             validate_data["user_id"],
                             token['data']['subscription_type'],
-                            'future',
                             '',
                             '',
                             ''
