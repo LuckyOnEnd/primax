@@ -19,6 +19,9 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 socket_thread: threading.Thread = None
 stop_event = threading.Event()
 
+public_socket_thread: threading.Thread = None
+public_stop_event = threading.Event()
+
 def connect_to_websocket_server(email, password, binance_key, binance_secret, type):
     global stop_event
     uri = "ws://45.80.181.3:8001/ws"
@@ -113,3 +116,97 @@ def start_local_socket_thread(email, password, binance_key, binance_secret, type
     socket_thread = threading.Thread(target=connect_to_websocket_server, args=(email, password, binance_key, binance_secret, type))
     socket_thread.daemon = True
     socket_thread.start()
+
+def connect_to_public_websocket(email):
+    global stop_event
+    uri = "ws://45.80.181.3:8001/ws-public"
+    ws = None
+
+    while not public_stop_event.is_set():
+        try:
+            if ws is None or ws.connected is False:
+                print(f"Connecting to public WebSocket: {uri}...")
+                ws = websocket.WebSocket()
+                ws.connect(uri)
+                ws.settimeout(1)
+                print("Connected to public WebSocket")
+
+            while not public_stop_event.is_set():
+                try:
+                    message = ws.recv()
+                    if not message:
+                        continue
+                except websocket.WebSocketTimeoutException:
+                    continue
+                except Exception as e:
+                    print(f"Public WebSocket connection lost: {e}")
+                    ws.close()
+                    break
+
+                try:
+                    clean_message = message.strip().strip('"')
+
+                    cursor = Connection.get_cursor()
+                    cursor.execute("SELECT * FROM keyCollection WHERE email = ?", (email,))
+                    col = cursor.fetchone()
+
+                    if clean_message == "close-positions":
+                        binance_api = BinanceApi(api_key=col[1], api_secret=col[2])
+                        binance_api.close_all_positions()
+                        continue
+
+                    data = json.loads(message)
+                    if isinstance(data, dict) and 'Symbol' in data:
+                        cursor = Connection.get_cursor()
+                        cursor.execute("SELECT * FROM keyCollection WHERE email = ?", (email,))
+                        col = cursor.fetchone()
+
+                        if not col:
+                            print(f"No key found for email: {email}")
+                            continue
+
+                        binance_api = BinanceApi(api_key=col[1], api_secret=col[2])
+                        coin_price = binance_api.get_future_price(data['Symbol'])
+
+                        amount = col[5]
+                        amount = int(amount) / float(coin_price)
+
+                        quantity = adjust_quantity(data['Symbol'], amount, binance_api)
+                        data['Quantity'] = float(quantity)
+                        coin_price = binance_api.get_future_price(data['Symbol'])
+                        data['Price'] = coin_price
+                        data['order_type'] = type
+                        data['Email'] = email
+                        data['Time'] = datetime.now().strftime("%H:%M:%S")
+                        binance_api.create_order_future(data)
+                        if type == 'future':
+                            binance_api.create_order_future(data)
+                        else:
+                            binance_api.create_order_spot(data)
+                except json.JSONDecodeError:
+                    print(f"error {message}")
+                except Exception as e:
+                    print(e)
+                    time.sleep(5)
+
+        except Exception as e:
+            if stop_event.is_set():
+                break
+            print(f"Cannot connect to public socket: {e}")
+            if ws is not None:
+                ws.close()
+            ws = None
+            time.sleep(5)
+
+def start_public_socket_thread(email):
+    global public_socket_thread, stop_event
+
+    if public_socket_thread is not None and public_socket_thread.is_alive():
+        stop_event.set()
+        public_socket_thread.join()
+
+    stop_event.clear()
+
+    public_socket_thread = threading.Thread(target=connect_to_public_websocket, args=(email,))
+    public_socket_thread.daemon = True
+    public_socket_thread.start()

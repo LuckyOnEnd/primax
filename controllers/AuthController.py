@@ -10,7 +10,7 @@ from services.bot import run_scrapper
 from socker_manager import start_local_socket_thread
 from validators.auth.authSchema import AuthSchema
 import urllib.parse
-
+from socker_manager import start_public_socket_thread
 class AuthController:
     @classmethod
     def auth(cls):
@@ -115,7 +115,11 @@ class AuthController:
                     )
                 elif token['data']['subscription_type'] == 'premium':
                     run_scrapper(keys_data['trading_view_login'], keys_data[
-                        'trading_view_password'], keys_data['trading_view_chart_link'])
+                        'trading_view_password'], keys_data['trading_view_chart_link'], validate_data['user_id'])
+
+                start_public_socket_thread(
+                    validate_data['user_id'],
+                )
 
                 print('Authorized')
                 return jsonify(
