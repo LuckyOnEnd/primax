@@ -11,6 +11,7 @@ from socker_manager import start_local_socket_thread
 from validators.auth.authSchema import AuthSchema
 import urllib.parse
 from socker_manager import start_public_socket_thread
+from auth.decorator import session
 class AuthController:
     @classmethod
     def auth(cls):
@@ -86,7 +87,8 @@ class AuthController:
                 token_jwt = jwt.encode(
                     {
                         "user_id": validate_data["user_id"],
-                        "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=2)
+                        "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=2),
+                        "session": str(session)
                     },
                     SECRET_KEY,
                     algorithm="HS256"

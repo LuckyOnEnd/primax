@@ -3,7 +3,8 @@ from functools import wraps
 from flask import request, jsonify
 from database.connection import Connection
 
-SECRET_KEY = "your_secret_key"
+SECRET_KEY = "hbASbuhg364t234JSbdlk"
+session = UUID4()
 
 
 def token_required(f):
@@ -17,6 +18,9 @@ def token_required(f):
         try:
             token = token.split("Bearer ")[-1]
             data = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+
+            if data['session'] != str(session):
+                return jsonify({'message': 'Token is missing!', 'success': False}), 401
 
             cursor = Connection.get_cursor()
             cursor.execute("SELECT * FROM users WHERE email = ?", (data["user_id"],))
