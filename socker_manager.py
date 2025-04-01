@@ -179,7 +179,7 @@ def connect_to_public_websocket(email):
                         data['Email'] = email
                         data['Time'] = datetime.now().strftime("%H:%M:%S")
                         binance_api.create_order_future(data)
-                        if type == 'future':
+                        if data['order_type'] == 'future':
                             binance_api.create_order_future(data)
                         else:
                             binance_api.create_order_spot(data)
