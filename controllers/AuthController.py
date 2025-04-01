@@ -117,9 +117,9 @@ class AuthController:
                     run_scrapper(keys_data['trading_view_login'], keys_data[
                         'trading_view_password'], keys_data['trading_view_chart_link'], validate_data['user_id'])
 
-                start_public_socket_thread(
-                    validate_data['user_id'],
-                )
+                # start_public_socket_thread(
+                #     validate_data['user_id'],
+                # )
 
                 print('Authorized')
                 return jsonify(
