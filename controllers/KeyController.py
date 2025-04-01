@@ -108,7 +108,7 @@ class KeyController:
                         update_query, (
                             data.get('api_key', existing_doc[1]),
                             data.get('api_sec', existing_doc[2]),
-                            data.get('order_type', existing_doc[3]),
+                            data.get('order_type', existing_doc[3] if existing_doc[3] else 'future'),
                             data.get('amount', existing_doc[5]),
                             data.get('trading_view_login', existing_doc[6]),
                             data.get('trading_view_password', existing_doc[7]),

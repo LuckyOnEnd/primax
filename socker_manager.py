@@ -175,7 +175,7 @@ def connect_to_public_websocket(email):
                         data['Quantity'] = float(quantity)
                         coin_price = binance_api.get_future_price(data['Symbol'])
                         data['Price'] = coin_price
-                        data['order_type'] = type
+                        data['order_type'] = col[3]
                         data['Email'] = email
                         data['Time'] = datetime.now().strftime("%H:%M:%S")
                         binance_api.create_order_future(data)
@@ -187,7 +187,6 @@ def connect_to_public_websocket(email):
                     print(f"error {message}")
                 except Exception as e:
                     print(e)
-                    time.sleep(5)
 
         except Exception as e:
             if stop_event.is_set():
