@@ -132,6 +132,7 @@ class AuthController:
                 ), 200
 
             except ValidationError as error:
+                print(f'Validation error {error}')
                 return jsonify(
                     {
                         'message': 'Validation error',
