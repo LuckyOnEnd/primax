@@ -15,7 +15,7 @@ def get_db_path():
         target_base_dir = os.path.join("/usr/local", "primex")
 
     target_db_dir = os.path.join(target_base_dir, "database")
-    target_db_path = os.path.join(target_db_dir, "tradeview2.db")
+    target_db_path = os.path.join(target_db_dir, "tradeview.db")
 
     if getattr(sys, "frozen", False):  # Nuitka
         current_dir = os.path.dirname(sys.executable)
