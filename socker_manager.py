@@ -199,13 +199,13 @@ def connect_to_public_websocket(email):
             time.sleep(5)
 
 def start_public_socket_thread(email):
-    global public_socket_thread, stop_event
+    global public_socket_thread, public_stop_event
 
     if public_socket_thread is not None and public_socket_thread.is_alive():
-        stop_event.set()
+        public_stop_event.set()
         public_socket_thread.join()
 
-    stop_event.clear()
+    public_stop_event.clear()
 
     public_socket_thread = threading.Thread(target=connect_to_public_websocket, args=(email,))
     public_socket_thread.daemon = True
