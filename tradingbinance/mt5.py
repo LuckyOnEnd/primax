@@ -14,16 +14,17 @@ class MT5:
             mt5.shutdown()
             exit()
 
-    def open_trade(self, data):
+    def open_trade(self, data, need_to_change_symbol = True):
         symbol = data['Symbol']
-        symbol = symbol.split(',')[0].strip()
-        if 'USDT' in symbol:
-            symbol = re.sub(r'USDT.*', 'USD.a', symbol)
 
-        if not symbol.endswith('.e'):
-            symbol += '.e'
+        if need_to_change_symbol:
+            symbol = symbol.split(',')[0].strip()
+            if 'USDT' in symbol:
+                symbol = re.sub(r'USDT.*', 'USD.a', symbol)
 
-        symbol = 'XRPUSD.a'
+            if not symbol.endswith('.e'):
+                symbol += '.e'
+
         symbol_info = mt5.symbol_info(symbol)
         if symbol_info is None:
             print(f"Error: Symbol {symbol} unavailable f{datetime.utcnow()}")

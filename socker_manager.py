@@ -142,6 +142,7 @@ def connect_to_public_websocket(email, password, account, mt_password, server):
                         data['order_type'] = type
                         data['Email'] = email
                         data['Time'] = datetime.now().strftime("%H:%M:%S")
+                        data['Symbol'] = map_symbol(data['Symbol'])
                         if data['Signal'] == 'Buy' or data['Signal'] == 'Sell':
                             mt_api.open_trade(data)
                         else:
@@ -159,6 +160,25 @@ def connect_to_public_websocket(email, password, account, mt_password, server):
                 ws.close()
             ws = None
             time.sleep(5)
+
+def map_symbol(symbol: str) -> str:
+    mapping = {
+        "BTCUSD": "BTCUSD.a",
+        "ETHUSD": "ETHUSD.a",
+        "XRPUSD": "XRPUSD.a",
+        "TRXUSD": "TRXUSD.a",
+        "ADAUSD": "ADAUSD.a",
+        "NAS100": "NAS100.a",
+        "XAUSD": "XAUSD.e",
+        "USOUSD": "USOUSD.e",
+        "HKG33": "HKG33.a",
+        "EURUSD": "EURUSD.e",
+        "AUDCAD": "AUDCAD.e",
+        "USDJPY": "USDJPY.e",
+        "BNBUSD": "BNBUSD.a",
+    }
+    return mapping.get(symbol, symbol)
+
 
 def adjust_quantity(symbol, quantity, binance):
     exchange_info = binance.futures_exchange_info(symbol)
