@@ -2,9 +2,12 @@ import jwt
 from functools import wraps
 from flask import request, jsonify
 from database.connection import Connection
+import uuid
 
 SECRET_KEY = "hbASbuhg364t234JSbdlk"
-session = UUID4()
+
+session = uuid.uuid4()
+
 
 
 def token_required(f):

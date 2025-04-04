@@ -17,7 +17,6 @@ from flask import request, jsonify
 # validations
 api_key_schema = keySchema()
 
-
 class KeyController:
 
     @classmethod

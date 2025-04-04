@@ -11,7 +11,6 @@ from flask_socketio import SocketIO
 
 from database.connection import Connection
 from tradingbinance.Binaceapi import BinanceApi
-
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
 socketio = SocketIO(app, cors_allowed_origins="*")
