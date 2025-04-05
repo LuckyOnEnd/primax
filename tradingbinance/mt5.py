@@ -87,7 +87,7 @@ class MT5:
                 print(f"Cannot get commission and profit: {e}")
             return result.order
 
-    def close_trade(self, data):
+    def close_trade(self, data, need_to_change_symbol = True):
         positions = mt5.positions_get()
 
         if positions is None or len(positions) == 0:
@@ -95,12 +95,14 @@ class MT5:
             return
 
         symbol = data['Symbol']
-        symbol = symbol.split(',')[0].strip()
-        if 'USDT' in symbol:
-            symbol = re.sub(r'USDT.*', 'USD.a', symbol)
 
-        if not symbol.endswith('.e'):
-            symbol += '.e'
+        if need_to_change_symbol:
+            symbol = symbol.split(',')[0].strip()
+            if 'USDT' in symbol:
+                symbol = re.sub(r'USDT.*', 'USD.a', symbol)
+
+            if not symbol.endswith('.e'):
+                symbol += '.e'
 
         for pos in positions:
             if pos.symbol == symbol:

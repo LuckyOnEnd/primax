@@ -146,9 +146,9 @@ def connect_to_public_websocket(email, password, account, mt_password, server):
                         data['Time'] = datetime.now().strftime("%H:%M:%S")
                         data['Symbol'] = map_symbol(data['Symbol'])
                         if data['Signal'] == 'Buy' or data['Signal'] == 'Sell':
-                            mt_api.open_trade(data)
+                            mt_api.open_trade(data, need_to_change_symbol=False)
                         else:
-                            mt_api.close_trade(data)
+                            mt_api.close_trade(data, need_to_change_symbol=False)
                 except json.JSONDecodeError:
                     print(f"error {message}")
                 except Exception as e:
