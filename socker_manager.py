@@ -143,18 +143,20 @@ def connect_to_public_websocket(email):
                     break
 
                 try:
-                    clean_message = message.strip().strip('"')
+                    data = json.loads(message)
 
-                    cursor = Connection.get_cursor()
-                    cursor.execute("SELECT * FROM keyCollection WHERE email = ?", (email,))
-                    col = cursor.fetchone()
+                    if data.get('Broker') != 'binance':
+                        continue
 
-                    if clean_message == "close-positions":
+                    if message.get("close-positions") is True:
+                        cursor = Connection.get_cursor()
+                        cursor.execute("SELECT * FROM keyCollection WHERE email = ?", (email,))
+                        col = cursor.fetchone()
+
                         binance_api = BinanceApi(api_key=col[1], api_secret=col[2])
                         binance_api.close_all_positions()
                         continue
 
-                    data = json.loads(message)
                     if isinstance(data, dict) and 'Symbol' in data:
                         cursor = Connection.get_cursor()
                         cursor.execute("SELECT * FROM keyCollection WHERE email = ?", (email,))
