@@ -116,14 +116,16 @@ def connect_to_public_websocket(email, password, account, mt_password, server):
                     break
 
                 try:
-                    clean_message = message.strip().strip('"')
+                    data = json.loads(message)
 
-                    if clean_message == "close-positions":
+                    if data.get('Broker') != 'MT4/MT5':
+                        continue
+
+                    if data.get("close-positions") is True:
                         mt_api = MT5(account=int(account), password=mt_password, server=server)
                         mt_api.close_all_positions()
                         continue
 
-                    data = json.loads(message)
                     if isinstance(data, dict) and 'Symbol' in data:
                         cursor = Connection.get_cursor()
                         cursor.execute(
