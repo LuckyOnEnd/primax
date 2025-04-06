@@ -92,7 +92,6 @@ def connect_to_public_websocket(email, password, account, mt_password, server):
     global stop_event
     uri = "ws://45.80.181.3:8001/ws-public"
     ws = None
-    print('ASD')
 
     while not public_stop_event.is_set():
         try:
