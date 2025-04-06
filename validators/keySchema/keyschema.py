@@ -4,15 +4,6 @@ from enum import Enum
 # Marshmallow schema
 class keySchema(Schema):
     # Define fields with validation
-    account = fields.String(
-        required=True,
-        error_messages={"required": "Account is required."},
-    )
-    password = fields.String(
-        required=True,
-        error_messages={"required": "Password is required."},
-    )
-    server = fields.String(required=True, error_messages={"required": "Server is invalid."})
     signal_type = fields.String()
 
     amount = fields.Float(

@@ -99,16 +99,13 @@ class KeyController:
                     # Обновление записи
                     update_query = """
                         UPDATE keyCollection 
-                        SET account = ?, password = ?, server = ?, amount = ?, 
+                        SET amount = ?, 
                             trading_view_login = ?, trading_view_password = ?, 
                             trading_view_chart_link = ?, subscription_type = ?
                         WHERE email = ?
                     """
                     cursor.execute(
                         update_query, (
-                            data.get('account', existing_doc[1]),
-                            data.get('password', existing_doc[2]),
-                            data.get('server', existing_doc[3]),
                             data.get('amount', existing_doc[5]),
                             data.get('trading_view_login', existing_doc[6]),
                             data.get('trading_view_password', existing_doc[7]),
@@ -146,16 +143,13 @@ class KeyController:
                 else:
                     insert_query = """
                         INSERT INTO keyCollection (
-                            account, password, server, email, amount,
+                            email, amount,
                             trading_view_login, trading_view_password, trading_view_chart_link,
                             subscription_type
-                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        ) VALUES (?, ?, ?, ?, ?, ?)
                     """
                     cursor.execute(
                         insert_query, (
-                            data.get('account'),
-                            data.get('password'),
-                            data.get('server'),
                             current_user['email'],
                             data.get('amount', 0),
                             data.get('trading_view_login'),
