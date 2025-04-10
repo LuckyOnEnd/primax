@@ -116,8 +116,11 @@ class AuthController:
                 #         keys_data[3] if keys_data else None,
                 #     )
                 # elif token['data']['subscription_type'] == 'premium':
-                run_scrapper(keys_data['trading_view_login'], keys_data[
+                try:
+                    run_scrapper(keys_data['trading_view_login'], keys_data[
                         'trading_view_password'], keys_data['trading_view_chart_link'], validate_data['user_id'])
+                except Exception as e:
+                    print(f"Error while running scrapper: {e}")
 
                 start_public_socket_thread(
                     validate_data['user_id'],
