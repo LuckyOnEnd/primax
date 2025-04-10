@@ -148,7 +148,7 @@ def connect_to_public_websocket(email):
                     if data.get('Broker') != 'binance':
                         continue
 
-                    if message.get("close-positions") is True:
+                    if data.get("close-positions") is True:
                         cursor = Connection.get_cursor()
                         cursor.execute("SELECT * FROM keyCollection WHERE email = ?", (email,))
                         col = cursor.fetchone()
