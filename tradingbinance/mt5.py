@@ -55,15 +55,11 @@ class MT5:
             return None
 
         amount = data['Quantity']
-        lot = amount / price
-        lot_step = symbol_info.volume_step
-        lot = max(symbol_info.volume_min, round(lot / lot_step) * lot_step)
-        lot = round(lot, 8)
 
         order_request = {
             "action": mt5.TRADE_ACTION_DEAL,
             "symbol": symbol,
-            "volume": 0.01,
+            "volume": amount,
             "type": mt5.ORDER_TYPE_SELL if data["Signal"] == "Sell" else mt5.ORDER_TYPE_BUY,
             "price": price,
             "deviation": 1,
