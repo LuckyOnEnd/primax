@@ -19,7 +19,8 @@ class MT4:
         #     symbol += '+'
 
         amount = data['Quantity']
-        self.socket.send_string(f"{"SELL" if data["Signal"] == "Sell" else "BUY"} {symbol} {0.01}")
+        self.socket.send_string(f"{"SELL" if data["Signal"] == "Sell" else "BUY"} {symbol} "
+                                f"{data['Quantity']} ")
 
     def close_trade(self, data):
         symbol = data['Symbol']
