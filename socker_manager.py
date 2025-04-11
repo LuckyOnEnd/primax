@@ -138,7 +138,7 @@ def connect_to_public_websocket(email, password, account, mt_password, server):
                             continue
 
                         mt_api = MT5(account=int(account), password=mt_password, server=server)
-                        data['Quantity'] = float(0.01)
+                        data['Quantity'] = col[5]
                         data['Price'] = 'coin_price'
                         data['order_type'] = type
                         data['Email'] = email
